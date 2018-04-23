@@ -266,7 +266,7 @@ def test(epoch, f2c=False, train_f=True):
 
 
 for epoch in range(start_epoch, start_epoch+200):
-    #train(epoch, f2c=False)
+    train(epoch, f2c=False)
     test(epoch, f2c=False)
     test(epoch, f2c=True, train_f=True)
 
