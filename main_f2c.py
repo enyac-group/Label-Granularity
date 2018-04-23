@@ -34,8 +34,10 @@ args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 if args.resume_dir is None:
+    print('resume_dir is None')
     save_path = os.path.join(args.results_dir, args.save)
 else:
+    print('resume_dir is not None')
     save_path = args.resume_dir
 if not os.path.exists(save_path):
     os.makedirs(save_path)
