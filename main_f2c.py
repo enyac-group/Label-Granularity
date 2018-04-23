@@ -29,11 +29,14 @@ parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
                     help='results dir')
-parser.add_argument('--resume_dir', default='./results', help='resume dir')
+parser.add_argument('--resume_dir', default=None, help='resume dir')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-save_path = os.path.join(args.results_dir, args.save)
+if args.resume_dir is None:
+    save_path = os.path.join(args.results_dir, args.save)
+else:
+    save_path = args.resume_dir
 if not os.path.exists(save_path):
     os.makedirs(save_path)
 setup_logging(os.path.join(save_path, 'log.txt'))
@@ -77,7 +80,6 @@ for idx,a_class in enumerate(classes):
 if args.resume:
     # Load checkpoint.
     print('==> Resuming from checkpoint..')
-    assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
     assert os.path.isdir(args.resume_dir)
     checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
     net = checkpoint['net']
@@ -187,7 +189,7 @@ def test(epoch, f2c=False):
 
     # Save checkpoint.
     acc = 100.*correct/total
-    if acc > best_acc:
+    if acc > best_acc and args.resume_dir is None:
         print('Saving..')
         state = {
             'net': net.module if use_cuda else net,
