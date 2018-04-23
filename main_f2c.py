@@ -39,7 +39,10 @@ else:
     save_path = args.resume_dir
 if not os.path.exists(save_path):
     os.makedirs(save_path)
-setup_logging(os.path.join(save_path, 'log.txt'))
+if args.resume_dir is None:
+    setup_logging(os.path.join(save_path, 'log.txt'))
+else:
+    setup_logging(os.path.join(save_path, 'log_eval.txt'))
 logging.info("saving to %s", save_path)
 logging.info("run arguments: %s", args)
 
@@ -156,7 +159,7 @@ def train(epoch, f2c=False):
                         train_prec1=100.*correct/total))
 
 
-def test(epoch, f2c=False):
+def test(epoch, f2c=False, train_f=True):
     global best_acc
     net.eval()
     test_loss = 0
@@ -174,6 +177,10 @@ def test(epoch, f2c=False):
 
         test_loss += loss.data[0]
         _, predicted = torch.max(outputs.data, 1)
+        if train_f and f2c:
+            predicted = 
+            for idx,a_predicted in predicted.data:
+                predicted.data[idx] = classes_f2c[a_predicted]
         total += targets.size(0)
         correct += predicted.eq(targets.data).cpu().sum()
 
@@ -206,4 +213,4 @@ def test(epoch, f2c=False):
 #     #test(epoch, f2c=False)
 #     test(epoch, f2c=True)
 
-test(0, f2c=True)
+test(0, f2c=True, train_f=True)

@@ -1,3 +1,7 @@
+python main_f2c.py --resume --resume_dir results/2018-04-23_03-38-31 
+
+
+
 # Train CIFAR10 with PyTorch
 
 I'm playing with [PyTorch](http://pytorch.org/) on the CIFAR10 dataset.
