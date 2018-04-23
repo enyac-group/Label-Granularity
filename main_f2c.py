@@ -1,3 +1,7 @@
+# To run this, pay attention to this:
+# define num_classes when initializing the model
+# define f2c when calling train() and test()
+
 '''Train CIFAR10 with PyTorch.'''
 from __future__ import print_function
 
@@ -60,6 +64,13 @@ testset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=False, do
 testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False, num_workers=2)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+#classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+classes_f2c = {}
+for idx,a_class in enumerate(classes):
+    if a_class in ['plane', 'car', 'ship', 'truck']:
+        classes_f2c[idx] = 0
+    elif a_class in ['bird', 'cat', 'deer', 'dog', 'frog', 'horse']:
+        classes_f2c[idx] = 1
 
 # Model
 if args.resume:
@@ -74,7 +85,7 @@ else:
     print('==> Building model..')
     # net = VGG('VGG19')
     # net = ResNet18()
-    net = PreActResNet18()
+    net = PreActResNet18(num_classes=2)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
@@ -104,7 +115,7 @@ regime = {
 logging.info('training regime: %s', regime)
 
 # Training
-def train(epoch):
+def train(epoch, f2c=False):
     print('\nEpoch: %d' % epoch)
     net.train()
     train_loss = 0
@@ -113,6 +124,9 @@ def train(epoch):
     global optimizer
     optimizer = adjust_optimizer(optimizer, epoch, regime)
     for batch_idx, (inputs, targets) in enumerate(trainloader):
+        if f2c:
+            for idx,target in enumerate(targets):
+                targets[idx] = classes_f2c[target]
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         optimizer.zero_grad()
@@ -138,13 +152,16 @@ def train(epoch):
                         train_prec1=100.*correct/total))
 
 
-def test(epoch):
+def test(epoch, f2c=False):
     global best_acc
     net.eval()
     test_loss = 0
     correct = 0
     total = 0
     for batch_idx, (inputs, targets) in enumerate(testloader):
+        if f2c:
+            for idx,target in enumerate(targets):
+                targets[idx] = classes_f2c[target]
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
@@ -161,8 +178,8 @@ def test(epoch):
     
     logging.info('\n Epoch: {0}\t'
                     'Testing Loss {test_loss:.3f} \t'
-                    'Testing Prec@1 {test_prec1:.3f} \t'
-                    .format(epoch + 1, 
+                    'Testing Prec@1 {test_prec1:.3f} \t\n'
+                    .format(epoch, 
                     test_loss=test_loss/len(testloader), 
                     test_prec1=100.*correct/total))
 
@@ -179,6 +196,10 @@ def test(epoch):
         best_acc = acc
 
 
+
 for epoch in range(start_epoch, start_epoch+200):
-    train(epoch)
-    test(epoch)
+    train(epoch, f2c=True)
+    #test(epoch, f2c=False)
+    test(epoch, f2c=True)
+
+# test(0, f2c=True)
