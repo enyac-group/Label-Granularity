@@ -74,9 +74,9 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 #classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 classes_f2c = {}
 for idx,a_class in enumerate(classes):
-    if a_class in ['plane', 'car', 'ship', 'truck']:
+    if a_class in ['bird', 'plane', 'car', 'ship', 'truck']:
         classes_f2c[idx] = 0
-    elif a_class in ['bird', 'cat', 'deer', 'dog', 'frog', 'horse']:
+    elif a_class in ['cat', 'deer', 'dog', 'frog', 'horse']:
         classes_f2c[idx] = 1
 
 # Model
