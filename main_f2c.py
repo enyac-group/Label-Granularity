@@ -14,7 +14,7 @@ import os
 import argparse
 
 from models import *
-from utils import progress_bar, adjust_optimizer
+from utils import progress_bar, adjust_optimizer, setup_logging
 from torch.autograd import Variable
 from datetime import datetime
 import logging
