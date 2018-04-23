@@ -177,11 +177,14 @@ def test(epoch, f2c=False, train_f=True):
 
         test_loss += loss.data[0]
         _, predicted = torch.max(outputs.data, 1)
-        if train_f and f2c:
-            for idx,a_predicted in predicted.data:
-                predicted.data[idx] = classes_f2c[a_predicted]
         total += targets.size(0)
-        correct += predicted.eq(targets.data).cpu().sum()
+        if train_f and f2c:
+            predicted_np = predicted.cpu().numpy()
+            for idx,a_predicted in predicted_np:
+                predicted_np[idx] = classes_f2c[a_predicted]
+            correct += (predicted_np == targets.cpu().numpu()).sum()
+        else:
+            correct += predicted.eq(targets.data).cpu().sum()
 
         #progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
         #    % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
