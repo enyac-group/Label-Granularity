@@ -178,7 +178,6 @@ def test(epoch, f2c=False, train_f=True):
         test_loss += loss.data[0]
         _, predicted = torch.max(outputs.data, 1)
         if train_f and f2c:
-            predicted = 
             for idx,a_predicted in predicted.data:
                 predicted.data[idx] = classes_f2c[a_predicted]
         total += targets.size(0)
