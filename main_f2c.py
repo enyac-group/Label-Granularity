@@ -133,7 +133,7 @@ def train(epoch):
             logging.info('\n Epoch: [{0}][{1}/{2}]\t'
                         'Training Loss {train_loss:.3f} \t'
                         'Training Prec@1 {train_prec1:.3f} \t'
-                        .format(epoch, i, len(trainloader),
+                        .format(epoch, batch_idx, len(trainloader),
                         train_loss=train_loss/(batch_idx+1), 
                         train_prec1=100.*correct/total))
 
