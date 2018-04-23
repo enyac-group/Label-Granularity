@@ -54,10 +54,10 @@ transform_test = transforms.Compose([
 ])
 
 trainset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, num_workers=2)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
 
 testset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
-testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
+testloader = torch.utils.data.DataLoader(testset, batch_size=1000, shuffle=False, num_workers=2)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
@@ -158,12 +158,13 @@ def test(epoch):
 
         progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
             % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
-        logging.info('\n Epoch: {0}\t'
-                     'Testing Loss {test_loss:.3f} \t'
-                     'Testing Prec@1 {test_prec1:.3f} \t'
-                     .format(epoch + 1, 
-                     test_loss=test_loss/(batch_idx+1), 
-                     test_prec1=100.*correct/total))
+    
+    logging.info('\n Epoch: {0}\t'
+                    'Testing Loss {test_loss:.3f} \t'
+                    'Testing Prec@1 {test_prec1:.3f} \t'
+                    .format(epoch + 1, 
+                    test_loss=test_loss/len(testloader), 
+                    test_prec1=100.*correct/total))
 
     # Save checkpoint.
     acc = 100.*correct/total
