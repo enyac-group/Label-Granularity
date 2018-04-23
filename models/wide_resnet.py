@@ -83,4 +83,4 @@ class Wide_ResNet(nn.Module):
         return out
 
 def wide_resnet(num_classes=10):
-    return Wide_ResNet(depth=28, widen_factor=20, dropout_rate=0.3, num_classes=num_classes)
+    return Wide_ResNet(depth=28, widen_factor=10, dropout_rate=0.3, num_classes=num_classes)
