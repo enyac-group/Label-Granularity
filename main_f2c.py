@@ -110,6 +110,7 @@ def train(epoch):
     train_loss = 0
     correct = 0
     total = 0
+    global optimizer
     optimizer = adjust_optimizer(optimizer, epoch, regime)
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         if use_cuda:
