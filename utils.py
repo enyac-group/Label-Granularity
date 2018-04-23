@@ -11,6 +11,7 @@ import math
 import torch.nn as nn
 import torch.nn.init as init
 import logging.config
+import torch
 
 def setup_logging(log_file='log.txt'):
     """Setup logging configuration
