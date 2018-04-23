@@ -72,14 +72,58 @@ trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True
 testset = torchvision.datasets.CIFAR100(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False, num_workers=2)
 
-classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-#classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+coarse_classes = ('aquatic_mammals', 'fish', 'flowers', 'food_containers', 
+                'fruit_and_vegetables', 'household_electrical_devices', 
+                'household_furniture', 'insects', 'large_carnivores', 
+                'large_man-made_outdoor_things', 'large_natural_outdoor_scenes', 
+                'large_omnivores_and_herbivores', 'medium_mammals', 
+                'non-insect_invertebrates', 'people', 'reptiles', 'small_mammals', 
+                'trees', 'vehicles_1', 'vehicles_2')
+
+fine_classes = ('apple', 'aquarium_fish', 'baby', 'bear', 'beaver', 'bed', 'bee', 
+                'beetle', 'bicycle', 'bottle', 'bowl', 'boy', 'bridge', 'bus', 
+                'butterfly', 'camel', 'can', 'castle', 'caterpillar', 'cattle', 
+                'chair', 'chimpanzee', 'clock', 'cloud', 'cockroach', 'couch', 
+                'crab', 'crocodile', 'cup', 'dinosaur', 'dolphin', 'elephant', 
+                'flatfish', 'forest', 'fox', 'girl', 'hamster', 'house', 
+                'kangaroo', 'keyboard', 'lamp', 'lawn_mower', 'leopard', 'lion', 
+                'lizard', 'lobster', 'man', 'maple_tree', 'motorcycle', 
+                'mountain', 'mouse', 'mushroom', 'oak_tree', 'orange', 'orchid', 
+                'otter', 'palm_tree', 'pear', 'pickup_truck', 'pine_tree', 
+                'plain', 'plate', 'poppy', 'porcupine', 'possum', 'rabbit', 
+                'raccoon', 'ray', 'road', 'rocket', 'rose', 'sea', 'seal', 
+                'shark', 'shrew', 'skunk', 'skyscraper', 'snail', 'snake', 
+                'spider', 'squirrel', 'streetcar', 'sunflower', 'sweet_pepper', 
+                'table', 'tank', 'telephone', 'television', 'tiger', 'tractor', 
+                'train', 'trout', 'tulip', 'turtle', 'wardrobe', 'whale', 
+                'willow_tree', 'wolf', 'woman', 'worm')
+
+classes_c2f = {'aquatic_mammals': ['beaver','dolphin','otter','seal','whale'], 
+                'fish': ['aquarium fish','flatfish','ray','shark','trout'], 
+                'flowers': ['orchids','poppies','roses','sunflowers','tulips'], 
+                'food_containers': ['bottles','bowls','cans','cups','plates'], 
+                'fruit_and_vegetables': ['apples','mushrooms','oranges','pears','sweet peppers'], 
+                'household_electrical_devices': ['clock','computer keyboard','lamp','telephone','television'], 
+                'household_furniture': ['bed','chair','couch','table','wardrobe'], 
+                'insects': ['bee','beetle','butterfly','caterpillar','cockroach'], 
+                'large_carnivores': ['bear','leopard','lion','tiger','wolf'], 
+                'large_man-made_outdoor_things': ['bridge','castle','house','road','skyscraper'], 
+                'large_natural_outdoor_scenes': ['cloud','forest','mountain','plain','sea'], 
+                'large_omnivores_and_herbivores': ['camel','cattle','chimpanzee','elephant','kangaroo'], 
+                'medium_mammals': ['fox','porcupine','possum','raccoon','skunk'], 
+                'non-insect_invertebrates': ['crab','lobster','snail','spider','worm'], 
+                'people': ['baby','boy','girl','man','woman'], 
+                'reptiles': ['crocodile','dinosaur','lizard','snake','turtle'], 
+                'small_mammals': ['hamster','mouse','rabbit','shrew','squirrel'], 
+                'trees': ['maple','oak','palm','pine','willow'], 
+                'vehicles_1': ['bicycle','bus','motorcycle','pickup truck','train'], 
+                'vehicles_2': ['lawn-mower','rocket','streetcar','tank','tractor']}
+
 classes_f2c = {}
-for idx,a_class in enumerate(classes):
-    if a_class in ['bird', 'plane', 'car', 'ship', 'truck']:
-        classes_f2c[idx] = 0
-    elif a_class in ['cat', 'deer', 'dog', 'frog', 'horse']:
-        classes_f2c[idx] = 1
+for idx,f_class in enumerate(fine_classes):
+    for jdx,c_class in enumerate(coarse_classes):
+        if f_class in classes_c2f[c_class]:
+            classes_f2c[idx] = jdx
 
 # Model
 if args.resume:
@@ -94,7 +138,8 @@ else:
     print('==> Building model..')
     # net = VGG('VGG19')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=2)
+    #net = PreActResNet18(num_classes=100)
+    net = wide_resnet(num_classes=100)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
@@ -117,9 +162,10 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
 regime = {
     0: {'optimizer': 'SGD', 'lr': 1e-1,
-        'weight_decay': 5e-4, 'momentum': 0.9},
-    150: {'lr': 1e-2},
-    250: {'lr': 1e-3}
+        'weight_decay': 5e-4, 'momentum': 0.9, 'nesterov': True},
+    60: {'lr': 2e-2},
+    120: {'lr': 4e-3},
+    160: {'lr': 8e-4}
 }
 logging.info('training regime: %s', regime)
 
@@ -217,8 +263,8 @@ def test(epoch, f2c=False, train_f=True):
 
 
 for epoch in range(start_epoch, start_epoch+200):
-    train(epoch, f2c=True)
-    #test(epoch, f2c=False)
-    test(epoch, f2c=True, train_f=False)
+    train(epoch, f2c=False)
+    test(epoch, f2c=False)
+    test(epoch, f2c=True, train_f=True)
 
 # test(0, f2c=True, train_f=True)
