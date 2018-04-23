@@ -99,11 +99,11 @@ fine_classes = ('apple', 'aquarium_fish', 'baby', 'bear', 'beaver', 'bed', 'bee'
                 'willow_tree', 'wolf', 'woman', 'worm')
 
 classes_c2f = {'aquatic_mammals': ['beaver','dolphin','otter','seal','whale'], 
-                'fish': ['aquarium fish','flatfish','ray','shark','trout'], 
-                'flowers': ['orchids','poppies','roses','sunflowers','tulips'], 
-                'food_containers': ['bottles','bowls','cans','cups','plates'], 
-                'fruit_and_vegetables': ['apples','mushrooms','oranges','pears','sweet peppers'], 
-                'household_electrical_devices': ['clock','computer keyboard','lamp','telephone','television'], 
+                'fish': ['aquarium_fish','flatfish','ray','shark','trout'], 
+                'flowers': ['orchid','poppy','rose','sunflower','tulip'], 
+                'food_containers': ['bottle','bowl','can','cup','plate'], 
+                'fruit_and_vegetables': ['apple','mushroom','orange','pear','sweet_pepper'], 
+                'household_electrical_devices': ['clock','keyboard','lamp','telephone','television'], 
                 'household_furniture': ['bed','chair','couch','table','wardrobe'], 
                 'insects': ['bee','beetle','butterfly','caterpillar','cockroach'], 
                 'large_carnivores': ['bear','leopard','lion','tiger','wolf'], 
@@ -115,15 +115,18 @@ classes_c2f = {'aquatic_mammals': ['beaver','dolphin','otter','seal','whale'],
                 'people': ['baby','boy','girl','man','woman'], 
                 'reptiles': ['crocodile','dinosaur','lizard','snake','turtle'], 
                 'small_mammals': ['hamster','mouse','rabbit','shrew','squirrel'], 
-                'trees': ['maple','oak','palm','pine','willow'], 
-                'vehicles_1': ['bicycle','bus','motorcycle','pickup truck','train'], 
-                'vehicles_2': ['lawn-mower','rocket','streetcar','tank','tractor']}
+                'trees': ['maple_tree','oak_tree','palm_tree','pine_tree','willow_tree'], 
+                'vehicles_1': ['bicycle','bus','motorcycle','pickup_truck','train'], 
+                'vehicles_2': ['lawn_mower','rocket','streetcar','tank','tractor']}
 
 classes_f2c = {}
 for idx,f_class in enumerate(fine_classes):
     for jdx,c_class in enumerate(coarse_classes):
         if f_class in classes_c2f[c_class]:
             classes_f2c[idx] = jdx
+    if idx not in classes_f2c:
+        print(idx)
+        raise ValueError()
 
 # Model
 if args.resume:
@@ -208,7 +211,6 @@ def train(epoch, f2c=False):
 
 
 def test(epoch, f2c=False, train_f=True):
-    print(classes_f2c)
     global best_acc
     net.eval()
     test_loss = 0
@@ -218,7 +220,6 @@ def test(epoch, f2c=False, train_f=True):
         if f2c:
             for idx,target in enumerate(targets):
                 targets[idx] = classes_f2c[target]
-                print('mapping from {} to {}'.format(target, classes_f2c[target]))
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
