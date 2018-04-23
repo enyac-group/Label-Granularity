@@ -29,6 +29,7 @@ parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
                     help='results dir')
+parser.add_argument('--resume_dir', default='./results', help='resume dir')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -77,7 +78,8 @@ if args.resume:
     # Load checkpoint.
     print('==> Resuming from checkpoint..')
     assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
-    checkpoint = torch.load('./checkpoint/ckpt.t7')
+    assert os.path.isdir(args.resume_dir)
+    checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
     net = checkpoint['net']
     best_acc = checkpoint['acc']
     start_epoch = checkpoint['epoch']
@@ -197,9 +199,9 @@ def test(epoch, f2c=False):
 
 
 
-for epoch in range(start_epoch, start_epoch+200):
-    train(epoch, f2c=True)
-    #test(epoch, f2c=False)
-    test(epoch, f2c=True)
+# for epoch in range(start_epoch, start_epoch+200):
+#     train(epoch, f2c=True)
+#     #test(epoch, f2c=False)
+#     test(epoch, f2c=True)
 
-# test(0, f2c=True)
+test(0, f2c=True)
