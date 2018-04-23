@@ -173,7 +173,7 @@ def test(epoch):
             'acc': acc,
             'epoch': epoch,
         }
-        torch.save(state, os.path.join(save_path, 'ckpt.t7')
+        torch.save(state, os.path.join(save_path, 'ckpt.t7'))
         best_acc = acc
 
 
