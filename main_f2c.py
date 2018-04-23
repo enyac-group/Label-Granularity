@@ -16,12 +16,24 @@ import argparse
 from models import *
 from utils import progress_bar, adjust_optimizer
 from torch.autograd import Variable
+import datetime
+import logging
 
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
+parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
+                    help='results dir')
 args = parser.parse_args()
+
+args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+save_path = os.path.join(args.results_dir, args.save)
+if not os.path.exists(save_path):
+    os.makedirs(save_path)
+setup_logging(os.path.join(save_path, 'log.txt'))
+logging.info("saving to %s", save_path)
+logging.info("run arguments: %s", args)
 
 use_cuda = torch.cuda.is_available()
 best_acc = 0  # best test accuracy
@@ -72,6 +84,10 @@ else:
     # net = ShuffleNetG2()
     # net = SENet18()
 
+logging.info("model structure: %s", net)
+num_parameters = sum([l.nelement() for l in net.parameters()])
+logging.info("number of parameters: %d", num_parameters)
+
 if use_cuda:
     net.cuda()
     net = torch.nn.DataParallel(net, device_ids=range(torch.cuda.device_count()))
@@ -85,6 +101,7 @@ regime = {
     150: {'lr': 1e-2},
     250: {'lr': 1e-3}
 }
+logging.info('training regime: %s', regime)
 
 # Training
 def train(epoch):
@@ -111,6 +128,14 @@ def train(epoch):
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
             % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
+        if batch_idx % 10 == 0:
+            logging.info('\n Epoch: [{0}][{1}/{2}]\t'
+                        'Training Loss {train_loss:.3f} \t'
+                        'Training Prec@1 {train_prec1:.3f} \t'
+                        .format(epoch, i, len(trainloader),
+                        train_loss=train_loss/(batch_idx+1), 
+                        train_prec1=100.*correct/total))
+
 
 def test(epoch):
     global best_acc
@@ -132,6 +157,12 @@ def test(epoch):
 
         progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
             % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+        logging.info('\n Epoch: {0}\t'
+                     'Testing Loss {test_loss:.3f} \t'
+                     'Testing Prec@1 {test_prec1:.3f} \t'
+                     .format(epoch + 1, 
+                     test_loss=test_loss/(batch_idx+1), 
+                     test_prec1=100.*correct/total))
 
     # Save checkpoint.
     acc = 100.*correct/total
@@ -142,9 +173,7 @@ def test(epoch):
             'acc': acc,
             'epoch': epoch,
         }
-        if not os.path.isdir('checkpoint'):
-            os.mkdir('checkpoint')
-        torch.save(state, './checkpoint/ckpt.t7')
+        torch.save(state, os.path.join(save_path, 'ckpt.t7')
         best_acc = acc
 
 

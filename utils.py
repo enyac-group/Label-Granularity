@@ -10,6 +10,21 @@ import math
 
 import torch.nn as nn
 import torch.nn.init as init
+import logging.config
+
+def setup_logging(log_file='log.txt'):
+    """Setup logging configuration
+    """
+    logging.basicConfig(level=logging.DEBUG,
+                        format="%(asctime)s - %(levelname)s - %(message)s",
+                        datefmt="%Y-%m-%d %H:%M:%S",
+                        filename=log_file,
+                        filemode='w')
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(message)s')
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
 
 __optimizers = {
     'SGD': torch.optim.SGD,
@@ -28,12 +43,12 @@ def adjust_optimizer(optimizer, epoch, config):
         if 'optimizer' in setting:
             optimizer = __optimizers[setting['optimizer']](
                 optimizer.param_groups)
-            print('OPTIMIZER - setting method = %s' %
+            logging.info('OPTIMIZER - setting method = %s' %
                           setting['optimizer'])
         for param_group in optimizer.param_groups:
             for key in param_group.keys():
                 if key in setting:
-                    print('OPTIMIZER - setting %s = %s' %
+                    logging.info('OPTIMIZER - setting %s = %s' %
                                   (key, setting[key]))
                     param_group[key] = setting[key]
         return optimizer
