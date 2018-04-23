@@ -185,8 +185,8 @@ def test(epoch, f2c=False, train_f=True):
             for idx,a_predicted in enumerate(predicted_np):
                 predicted_np[idx] = classes_f2c[a_predicted]
             #correct += (predicted_np == targets.cpu().numpy()).sum()
-            print('targets: {}'.format(targets))
-            correct += (predicted_np == targets.numpy()).sum()
+            #print('targets: {}'.format(targets))
+            correct += (predicted_np == targets.data.numpy()).sum()
         else:
             correct += predicted.eq(targets.data).cpu().sum()
 
