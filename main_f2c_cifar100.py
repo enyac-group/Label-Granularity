@@ -217,6 +217,7 @@ def test(epoch, f2c=False, train_f=True):
         if f2c:
             for idx,target in enumerate(targets):
                 targets[idx] = classes_f2c[target]
+                print('mapping from {} to {}'.format(target, classes_f2c[target]))
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
@@ -250,7 +251,7 @@ def test(epoch, f2c=False, train_f=True):
 
     # Save checkpoint.
     acc = 100.*correct/total
-    if acc > best_acc and args.resume_dir is None and not (train_f and fc2):
+    if acc > best_acc and args.resume_dir is None and not (train_f and f2c):
         print('Saving..')
         state = {
             'net': net.module if use_cuda else net,
