@@ -250,7 +250,7 @@ def test(epoch, f2c=False, train_f=True):
 
     # Save checkpoint.
     acc = 100.*correct/total
-    if acc > best_acc and args.resume_dir is None:
+    if acc > best_acc and args.resume_dir is None and not (train_f and fc2):
         print('Saving..')
         state = {
             'net': net.module if use_cuda else net,
