@@ -14,7 +14,7 @@ import os
 import argparse
 
 from models import *
-from utils import progress_bar
+from utils import progress_bar, adjust_optimizer
 from torch.autograd import Variable
 
 
@@ -79,6 +79,12 @@ if use_cuda:
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
+regime = {
+    0: {'optimizer': 'SGD', 'lr': 1e-1,
+        'weight_decay': 5e-4, 'momentum': 0.9},
+    150: {'lr': 1e-2},
+    250: {'lr': 1e-3}
+}
 
 # Training
 def train(epoch):
@@ -87,6 +93,7 @@ def train(epoch):
     train_loss = 0
     correct = 0
     total = 0
+    optimizer = adjust_optimizer(optimizer, epoch, regime)
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()

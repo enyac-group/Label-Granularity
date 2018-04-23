@@ -11,6 +11,41 @@ import math
 import torch.nn as nn
 import torch.nn.init as init
 
+__optimizers = {
+    'SGD': torch.optim.SGD,
+    'ASGD': torch.optim.ASGD,
+    'Adam': torch.optim.Adam,
+    'Adamax': torch.optim.Adamax,
+    'Adagrad': torch.optim.Adagrad,
+    'Adadelta': torch.optim.Adadelta,
+    'Rprop': torch.optim.Rprop,
+    'RMSprop': torch.optim.RMSprop
+}
+
+def adjust_optimizer(optimizer, epoch, config):
+    """Reconfigures the optimizer according to epoch and config dict"""
+    def modify_optimizer(optimizer, setting):
+        if 'optimizer' in setting:
+            optimizer = __optimizers[setting['optimizer']](
+                optimizer.param_groups)
+            print('OPTIMIZER - setting method = %s' %
+                          setting['optimizer'])
+        for param_group in optimizer.param_groups:
+            for key in param_group.keys():
+                if key in setting:
+                    print('OPTIMIZER - setting %s = %s' %
+                                  (key, setting[key]))
+                    param_group[key] = setting[key]
+        return optimizer
+
+    if callable(config):
+        optimizer = modify_optimizer(optimizer, config(epoch))
+    else:
+        for e in range(epoch + 1):  # run over all epochs - sticky setting
+            if e in config:
+                optimizer = modify_optimizer(optimizer, config[e])
+
+    return optimizer
 
 def get_mean_and_std(dataset):
     '''Compute the mean and std value of dataset.'''
