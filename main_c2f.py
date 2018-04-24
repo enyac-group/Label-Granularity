@@ -79,7 +79,7 @@ if args.resume:
     assert os.path.isdir(args.resume_dir)
     checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
     net = checkpoint['net']
-    best_acc = checkpoint['acc']
+    #best_acc = checkpoint['acc']
     start_epoch = checkpoint['epoch']
 else:
     print('==> Building model..')
@@ -174,7 +174,8 @@ regime = {
     0: {'optimizer': 'SGD', 'lr': 1e-1,
         'weight_decay': 5e-4, 'momentum': 0.9},
     150: {'lr': 1e-2},
-    250: {'lr': 1e-3}
+    250: {'lr': 1e-3},
+    350: {'lr': 1e-4}
 }
 logging.info('training regime: %s', regime)
 
@@ -272,6 +273,6 @@ def test(epoch, net_new, testloader, fine=False, train_f=True):
         best_acc = acc
 
 start_epoch = 0
-for epoch in range(start_epoch, start_epoch+300):
+for epoch in range(start_epoch, start_epoch+400):
     train(epoch, net_new, trainloader, optimizer, fine=True)    
     test(epoch, net_new, testloader, fine=False, train_f=True)
