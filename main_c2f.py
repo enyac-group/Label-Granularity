@@ -175,18 +175,17 @@ regime = {
 logging.info('training regime: %s', regime)
 
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
-def train(epoch, fine=False):
+def train(epoch, net_new, trainloader, optimizer, fine=False):
     print('\nEpoch: %d' % epoch)
     net_new.train()
     train_loss = 0
     correct = 0
     total = 0
-    global optimizer
     optimizer = adjust_optimizer(optimizer, epoch, regime)
     for batch_idx, (inputs, input_idx, targets) in enumerate(trainloader):
         if fine:
             for idx,target in enumerate(targets):
-                #print(targets[idx], label_f[idx])
+                print(targets[idx], label_f[input_idx[idx]])
                 targets[idx] = int(label_f[input_idx[idx]])
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
@@ -216,7 +215,7 @@ def train(epoch, fine=False):
                         train_prec1=100.*correct/total))
 
 
-def test(epoch, fine=False, train_f=True):
+def test(epoch, net_new, testloader, fine=False, train_f=True):
     global best_acc
     net_new.eval()
     test_loss = 0
@@ -270,5 +269,5 @@ def test(epoch, fine=False, train_f=True):
 
 start_epoch = 0
 for epoch in range(start_epoch, start_epoch+200):
-    train(epoch, fine=True)    
-    test(epoch, fine=False, train_f=True)
+    train(epoch, net_new, trainloader, optimizer, fine=True)    
+    test(epoch, net_new, testloader, fine=False, train_f=True)
