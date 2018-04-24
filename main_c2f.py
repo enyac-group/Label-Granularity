@@ -158,14 +158,14 @@ pickle.dump(label_f, open(os.path.join(save_path, 'label_f.pkl'), 'wb'))
 
 # Step3: use the new label to train network
 # Training
-net = PreActResNet18(num_classes=10*num_clusters)
+net_new = PreActResNet18(num_classes=10*num_clusters)
 if use_cuda:
-    net.cuda()
-    net = torch.nn.DataParallel(net, device_ids=[0])
+    net_new.cuda()
+    net_new = torch.nn.DataParallel(net_new, device_ids=[0])
     cudnn.benchmark = True
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
+optimizer = optim.SGD(net_new.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
 regime = {
     0: {'optimizer': 'SGD', 'lr': 1e-1,
         'weight_decay': 5e-4, 'momentum': 0.9},
@@ -177,7 +177,7 @@ logging.info('training regime: %s', regime)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
 def train(epoch, fine=False):
     print('\nEpoch: %d' % epoch)
-    net.train()
+    net_new.train()
     train_loss = 0
     correct = 0
     total = 0
@@ -192,7 +192,7 @@ def train(epoch, fine=False):
             inputs, targets = inputs.cuda(), targets.cuda()
         optimizer.zero_grad()
         inputs, targets = Variable(inputs), Variable(targets)
-        outputs, feats = net(inputs)
+        outputs, feats = net_new(inputs)
         #print(outputs.data.cpu().numpy())
         loss = criterion(outputs, targets)
         loss.backward()
@@ -218,7 +218,7 @@ def train(epoch, fine=False):
 
 def test(epoch, fine=False, train_f=True):
     global best_acc
-    net.eval()
+    net_new.eval()
     test_loss = 0
     correct = 0
     total = 0
@@ -228,7 +228,7 @@ def test(epoch, fine=False, train_f=True):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
-        outputs, feats = net(inputs)
+        outputs, feats = net_new(inputs)
         loss = criterion(outputs, targets)
 
         test_loss += loss.data[0]
@@ -261,7 +261,7 @@ def test(epoch, fine=False, train_f=True):
     if acc > best_acc:
         print('Saving..')
         state = {
-            'net': net.module if use_cuda else net,
+            'net': net_new.module if use_cuda else net_new,
             'acc': acc,
             'epoch': epoch,
         }
