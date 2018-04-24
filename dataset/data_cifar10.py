@@ -101,7 +101,7 @@ class CIFAR10(data.Dataset):
             self.test_data = self.test_data.reshape((10000, 3, 32, 32))
             self.test_data = self.test_data.transpose((0, 2, 3, 1))  # convert to HWC
 
-def __getitem__(self, index):
+    def __getitem__(self, index):
         """
         Args:
             index (int): Index
@@ -130,7 +130,8 @@ def __getitem__(self, index):
     def __len__(self):
         if self.train:
             return 50000
-        return 10000
+        else:
+            return 10000
 
     def _check_integrity(self):
         root = self.root
