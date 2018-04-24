@@ -117,8 +117,8 @@ def get_feat(net, trainloader):
     all_idx = []
     all_targets = []
     for batch_idx, (inputs, input_idx, targets) in enumerate(trainloader):
-        all_idx.append(input_idx)
-        all_targets.append(targets)
+        all_idx.append(input_idx.numpy())
+        all_targets.append(targets.numpy())
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
