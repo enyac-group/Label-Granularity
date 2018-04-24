@@ -24,6 +24,7 @@ from torch.autograd import Variable
 from datetime import datetime
 import logging
 import numpy as np
+import pickle
 
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
@@ -151,6 +152,7 @@ for a_class in range(len(classes)):
 
 label_f = np.hstack(label_f)
 label_f = label_f[train_idx.argsort()]
+pickle.dump(label_f, open(os.path.join(save_path, 'label_f.pkl'), 'wb'))
 
 # Step3: use the new label to train network
 # Training
@@ -232,7 +234,7 @@ def test(epoch, fine=False, train_f=True):
             #print('predicted: {}'.format(predicted))
             #print('predicted_np: {}'.format(predicted_np))
             for idx,a_predicted in enumerate(predicted_np):
-                predicted_np[idx] = predicted_np // num_clusters
+                predicted_np[idx] = a_predicted // num_clusters
             #correct += (predicted_np == targets.cpu().numpy()).sum()
             #print('targets: {}'.format(targets))
             correct += (predicted_np == targets.data.cpu().numpy()).sum()
