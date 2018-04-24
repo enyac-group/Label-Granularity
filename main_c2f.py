@@ -1,6 +1,7 @@
 # To run this, pay attention to this:
 # define num_classes when initializing the model
 # define f2c when calling train() and test()
+# define num_clusters
 
 '''Train CIFAR10 with PyTorch.'''
 from __future__ import print_function
@@ -26,6 +27,8 @@ import logging
 import numpy as np
 import pickle
 
+NUM_CLASSES = 2
+NUM_CLUSTERS = 5
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -61,20 +64,13 @@ transform_test = transforms.Compose([
     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
 ])
 
-trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
+trainset = dataset.data_cifar10_red.CIFAR10_RED(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
+#trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
 #trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
 
-testset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
+testset = dataset.data_cifar10_red.CIFAR10_RED(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
+#testset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False, num_workers=2)
-
-classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-#classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-classes_f2c = {}
-for idx,a_class in enumerate(classes):
-    if a_class in ['bird', 'plane', 'car', 'ship', 'truck']:
-        classes_f2c[idx] = 0
-    elif a_class in ['cat', 'deer', 'dog', 'frog', 'horse']:
-        classes_f2c[idx] = 1
 
 # Model
 if args.resume:
@@ -147,11 +143,10 @@ def clustering(train_data, num_clusters):
     return cluster_algo.labels_.reshape(-1)
 
 label_f = np.zeros(len(all_targets))
-num_clusters = 2
-for a_class in range(len(classes)):
+for a_class in range(NUM_CLASSES):
     idx = (all_targets == a_class)
-    label_cur = clustering(train_feats[idx], num_clusters=num_clusters)
-    label_cur = label_cur + num_clusters * a_class
+    label_cur = clustering(train_feats[idx], num_clusters=NUM_CLUSTERS)
+    label_cur = label_cur + NUM_CLUSTERS * a_class
     label_f[idx] = label_cur
 
 #label_f = np.hstack(label_f)
@@ -162,7 +157,7 @@ pickle.dump(label_f, open(os.path.join(save_path, 'label_f.pkl'), 'wb'))
 
 # Step3: use the new label to train network
 # Training
-net_new = PreActResNet18(num_classes=10*num_clusters)
+net_new = PreActResNet18(num_classes=NUM_CLASSES*NUM_CLUSTERS)
 if use_cuda:
     net_new.cuda()
     net_new = torch.nn.DataParallel(net_new, device_ids=[0])
@@ -247,7 +242,7 @@ def test(epoch, net_new, testloader, fine=False, train_f=True):
             #print('predicted: {}'.format(predicted))
             #print('predicted_np: {}'.format(predicted_np))
             for idx,a_predicted in enumerate(predicted_np):
-                predicted_np[idx] = a_predicted // num_clusters
+                predicted_np[idx] = a_predicted // NUM_CLUSTERS
             #correct += (predicted_np == targets.cpu().numpy()).sum()
             #print('targets: {}'.format(targets))
             correct += (predicted_np == targets.data.cpu().numpy()).sum()
