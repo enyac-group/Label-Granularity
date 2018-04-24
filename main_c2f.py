@@ -62,7 +62,7 @@ transform_test = transforms.Compose([
 ])
 
 trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
+#trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
 
 testset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False, num_workers=2)
@@ -193,6 +193,7 @@ def train(epoch, fine=False):
         optimizer.zero_grad()
         inputs, targets = Variable(inputs), Variable(targets)
         outputs, feats = net(inputs)
+        print('outputs: ', outputs)
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
