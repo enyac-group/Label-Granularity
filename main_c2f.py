@@ -132,6 +132,9 @@ def get_feat(net, trainloader):
    
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=False, num_workers=2)
 train_feats, train_idx, all_targets = get_feat(net, trainloader)
+print('1', train_feats) 
+print('2', train_idx) 
+print('3', all_targets)
 
 # Step2: cluster the data points per class
 import sklearn.cluster as cls
