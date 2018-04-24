@@ -182,8 +182,8 @@ def train(epoch, fine=False):
     for batch_idx, (inputs, input_idx, targets) in enumerate(trainloader):
         if fine:
             for idx,target in enumerate(targets):
-                print(targets[idx], label_f[idx])
-                targets[idx] = label_f[idx]
+                #print(targets[idx], label_f[idx])
+                targets[idx] = int(label_f[idx])
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         optimizer.zero_grad()
@@ -261,7 +261,7 @@ def test(epoch, fine=False, train_f=True):
         torch.save(state, os.path.join(save_path, 'ckpt.t7'))
         best_acc = acc
 
-
+start_epoch = 0
 for epoch in range(start_epoch, start_epoch+200):
     train(epoch, fine=True)    
     test(epoch, fine=False, train_f=True)
