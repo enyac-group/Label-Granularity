@@ -133,6 +133,7 @@ def get_feat(net, trainloader):
    
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=False, num_workers=2)
 train_feats, train_idx, all_targets = get_feat(net, trainloader)
+pickle.dump([train_idx, all_targets], open(os.path.join(save_path, 'debug.pkl'), 'wb'))
 
 # Step2: cluster the data points per class
 import sklearn.cluster as cls
@@ -185,7 +186,7 @@ def train(epoch, net_new, trainloader, optimizer, fine=False):
     for batch_idx, (inputs, input_idx, targets) in enumerate(trainloader):
         if fine:
             for idx,target in enumerate(targets):
-                print(targets[idx], label_f[input_idx[idx]])
+                print(targets[idx], int(label_f[input_idx[idx]]))
                 targets[idx] = int(label_f[input_idx[idx]])
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
