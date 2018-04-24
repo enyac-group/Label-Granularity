@@ -165,6 +165,11 @@ if use_cuda:
     net_new = torch.nn.DataParallel(net_new, device_ids=[0])
     cudnn.benchmark = True
 
+# init from pre-trained model
+# net_new_dict = net_new.state_dict()
+# net_new_dict.update(net.state_dict())
+# net_new.load_state_dict(net_new_dict)
+
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net_new.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
 regime = {
