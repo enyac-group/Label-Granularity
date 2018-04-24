@@ -130,8 +130,7 @@ def __getitem__(self, index):
     def __len__(self):
         if self.train:
             return 50000
-        else:
-            return 10000
+        return 10000
 
     def _check_integrity(self):
         root = self.root
