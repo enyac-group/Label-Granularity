@@ -174,7 +174,7 @@ if use_cuda:
     net = torch.nn.DataParallel(net, device_ids=[0])
     cudnn.benchmark = True
     
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=False, num_workers=2)
 def train(epoch, fine=False):
     print('\nEpoch: %d' % epoch)
     net.train()
@@ -193,7 +193,7 @@ def train(epoch, fine=False):
         optimizer.zero_grad()
         inputs, targets = Variable(inputs), Variable(targets)
         outputs, feats = net(inputs)
-        print('outputs ', outputs.data.cpu().numpy())
+        #print(outputs.data.cpu().numpy())
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
