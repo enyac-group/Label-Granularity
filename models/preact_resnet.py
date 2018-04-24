@@ -93,7 +93,7 @@ class PreActResNet(nn.Module):
         out = F.avg_pool2d(out, 4)
         out = out.view(out.size(0), -1)
         out = self.linear(out)
-        feat = F.softmax(out, dim=1)
+        feat = F.softmax(out)
         return out, feat
 
 
