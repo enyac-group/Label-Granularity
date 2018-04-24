@@ -199,6 +199,8 @@ def train(epoch, fine=False):
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
         correct += predicted.eq(targets.data).cpu().sum()
+        print(predicted)
+        print(targets)
 
         #progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
         #    % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
