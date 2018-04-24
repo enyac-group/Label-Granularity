@@ -134,6 +134,8 @@ def get_feat(net, trainloader):
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=False, num_workers=2)
 train_feats, train_idx, all_targets = get_feat(net, trainloader)
 print('all feats size: {}'.format(train_feats.shape))
+print('feats sum: {}'.format(train_feats.sum(axis=1)))
+print('feats first row: {}'.format(train_feats[0]))
 pickle.dump([train_idx, all_targets], open(os.path.join(save_path, 'debug.pkl'), 'wb'))
 
 # Step2: cluster the data points per class
