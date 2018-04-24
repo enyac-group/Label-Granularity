@@ -123,7 +123,7 @@ def get_feat(net, trainloader):
             inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
         outputs, feats = net(inputs)
-        all_feats.append(feats.cpu().numpy())
+        all_feats.append(feats.data.cpu().numpy())
     all_feats = np.vstack(all_feats)
     all_idx = np.hstack(all_idx)
     all_targets = np.hstack(all_targets)
