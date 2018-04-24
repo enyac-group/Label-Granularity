@@ -1,1 +1,1 @@
-import data_cifar10
+from .data_cifar10 import *
