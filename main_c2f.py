@@ -193,7 +193,7 @@ def train(epoch, fine=False):
         optimizer.zero_grad()
         inputs, targets = Variable(inputs), Variable(targets)
         outputs, feats = net(inputs)
-        print('outputs: ', outputs.data)
+        print('outputs ', outputs.data.cpu().numpy())
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
