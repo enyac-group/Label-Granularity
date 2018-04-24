@@ -130,10 +130,10 @@ def get_feat(net, trainloader):
     all_targets = np.hstack(all_targets)
     return all_feats, all_idx, all_targets
 
-print('all feats size: {}'.format(all_feats.shape))
 
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=False, num_workers=2)
 train_feats, train_idx, all_targets = get_feat(net, trainloader)
+print('all feats size: {}'.format(all_feats.shape))
 pickle.dump([train_idx, all_targets], open(os.path.join(save_path, 'debug.pkl'), 'wb'))
 
 # Step2: cluster the data points per class
