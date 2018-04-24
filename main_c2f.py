@@ -151,7 +151,9 @@ for a_class in range(len(classes)):
     label_f.append(label_cur)
 
 label_f = np.hstack(label_f)
+print('before sorting:', label_f)
 label_f = label_f[train_idx.argsort()]
+print('after sorting:', label_f)
 pickle.dump(label_f, open(os.path.join(save_path, 'label_f.pkl'), 'wb'))
 
 # Step3: use the new label to train network
@@ -199,8 +201,6 @@ def train(epoch, fine=False):
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
         correct += predicted.eq(targets.data).cpu().sum()
-        print(predicted)
-        print(targets)
 
         #progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
         #    % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
