@@ -13,6 +13,7 @@ import torch.backends.cudnn as cudnn
 
 import torchvision
 import torchvision.transforms as transforms
+import dataset
 
 import os
 import argparse
@@ -22,6 +23,7 @@ from utils import progress_bar, adjust_optimizer, setup_logging
 from torch.autograd import Variable
 from datetime import datetime
 import logging
+import numpy as np
 
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
@@ -33,18 +35,10 @@ parser.add_argument('--resume_dir', default=None, help='resume dir')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-if args.resume_dir is None:
-    print('resume_dir is None')
-    save_path = os.path.join(args.results_dir, args.save)
-else:
-    print('resume_dir is not None')
-    save_path = args.resume_dir
+save_path = os.path.join(args.results_dir, args.save)
 if not os.path.exists(save_path):
     os.makedirs(save_path)
-if args.resume_dir is None:
-    setup_logging(os.path.join(save_path, 'log.txt'))
-else:
-    setup_logging(os.path.join(save_path, 'log_eval.txt'))
+setup_logging(os.path.join(save_path, 'log.txt'))
 logging.info("saving to %s", save_path)
 logging.info("run arguments: %s", args)
 
@@ -66,10 +60,10 @@ transform_test = transforms.Compose([
     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
 ])
 
-trainset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
+trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
 
-testset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
+testset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False, num_workers=2)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
@@ -94,7 +88,7 @@ else:
     print('==> Building model..')
     # net = VGG('VGG19')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=2)
+    net = PreActResNet18(num_classes=10)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
@@ -110,9 +104,48 @@ logging.info("number of parameters: %d", num_parameters)
 
 if use_cuda:
     net.cuda()
-    net = torch.nn.DataParallel(net, device_ids=[0])
+    net = torch.nn.DataParallel(net, device_ids=range(torch.cuda.device_count()))
     cudnn.benchmark = True
 
+
+
+# Step1: start from a pre-trained model, load it and save the output of last layer
+# result format: a matrix where each row is a datapoint, a vector as class of each datapoint
+def get_feat(net, trainloader):
+    net.eval()
+    all_feats = []
+    all_idx = []
+    all_targets = []
+    for batch_idx, (inputs, input_idx, targets) in enumerate(trainloader):
+        all_idx.append(input_idx)
+        all_targets.append(targets)
+        if use_cuda:
+            inputs, targets = inputs.cuda(), targets.cuda()
+        inputs, targets = Variable(inputs, volatile=True), Variable(targets)
+        outputs, feats = net(inputs)
+        all_feats.append(feats.cpu().numpy())
+    all_feats = np.vstack(all_feats)
+    all_idx = np.hstack(all_idx)
+    all_targets = np.hstack(all_targets)
+    return all_feats, all_idx, all_targets
+
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=False, num_workers=2)
+train_feats, train_idx, all_targets = get_feat(net, trainloader)
+
+# Step2: cluster the data points per class
+label_f = []
+num_clusters = 2
+for a_class in range(len(classes)):
+    idx = (all_targets == a_class)
+    label_cur = cluster(train_feats[idx], num_clusters=num_clusters)
+    label_cur = label_cur + num_clusters * a_class
+    label_f.append(label_cur)
+
+label_f = np.hstack(label_f)
+label_f = label_f[train_idx.argsort()]
+
+# Step3: use the new label to train network
+# Training
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
 regime = {
@@ -123,8 +156,14 @@ regime = {
 }
 logging.info('training regime: %s', regime)
 
-# Training
-def train(epoch, f2c=False):
+net = PreActResNet18(num_classes=10*num_clusters)
+if use_cuda:
+    net.cuda()
+    net = torch.nn.DataParallel(net, device_ids=range(torch.cuda.device_count()))
+    cudnn.benchmark = True
+    
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
+def train(epoch, fine=False):
     print('\nEpoch: %d' % epoch)
     net.train()
     train_loss = 0
@@ -132,10 +171,10 @@ def train(epoch, f2c=False):
     total = 0
     global optimizer
     optimizer = adjust_optimizer(optimizer, epoch, regime)
-    for batch_idx, (inputs, targets) in enumerate(trainloader):
-        if f2c:
+    for batch_idx, (inputs, input_idx, targets) in enumerate(trainloader):
+        if fine:
             for idx,target in enumerate(targets):
-                targets[idx] = classes_f2c[target]
+                targets[idx] = label_f[idx]
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         optimizer.zero_grad()
@@ -161,16 +200,15 @@ def train(epoch, f2c=False):
                         train_prec1=100.*correct/total))
 
 
-def test(epoch, f2c=False, train_f=True):
+def test(epoch, fine=False, train_f=True):
     global best_acc
     net.eval()
     test_loss = 0
     correct = 0
     total = 0
-    for batch_idx, (inputs, targets) in enumerate(testloader):
-        if f2c:
-            for idx,target in enumerate(targets):
-                targets[idx] = classes_f2c[target]
+    for batch_idx, (inputs, input_idx, targets) in enumerate(testloader):
+        if fine:
+            raise ValueError
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
@@ -180,12 +218,12 @@ def test(epoch, f2c=False, train_f=True):
         test_loss += loss.data[0]
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
-        if train_f and f2c:
+        if train_f and not fine:
             predicted_np = predicted.cpu().numpy()
             #print('predicted: {}'.format(predicted))
             #print('predicted_np: {}'.format(predicted_np))
             for idx,a_predicted in enumerate(predicted_np):
-                predicted_np[idx] = classes_f2c[a_predicted]
+                predicted_np[idx] = predicted_np // num_clusters
             #correct += (predicted_np == targets.cpu().numpy()).sum()
             #print('targets: {}'.format(targets))
             correct += (predicted_np == targets.data.cpu().numpy()).sum()
@@ -204,7 +242,7 @@ def test(epoch, f2c=False, train_f=True):
 
     # Save checkpoint.
     acc = 100.*correct/total
-    if acc > best_acc and args.resume_dir is None:
+    if acc > best_acc:
         print('Saving..')
         state = {
             'net': net.module if use_cuda else net,
@@ -215,10 +253,6 @@ def test(epoch, f2c=False, train_f=True):
         best_acc = acc
 
 
-
 for epoch in range(start_epoch, start_epoch+200):
-    train(epoch, f2c=True)
-    #test(epoch, f2c=False)
-    test(epoch, f2c=True, train_f=False)
-
-# test(0, f2c=True, train_f=True)
+    train(epoch, fine=True)    
+    test(epoch, fine=False, train_f=True)

@@ -158,7 +158,7 @@ logging.info("number of parameters: %d", num_parameters)
 
 if use_cuda:
     net.cuda()
-    net = torch.nn.DataParallel(net, device_ids=range(torch.cuda.device_count()))
+    net = torch.nn.DataParallel(net, device_ids=[0])
     cudnn.benchmark = True
 
 criterion = nn.CrossEntropyLoss()
