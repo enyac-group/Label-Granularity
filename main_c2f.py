@@ -151,9 +151,9 @@ for a_class in range(len(classes)):
     label_f.append(label_cur)
 
 label_f = np.hstack(label_f)
-print('before sorting:', label_f)
+#print('before sorting:', label_f)
 label_f = label_f[train_idx.argsort()]
-print('after sorting:', label_f)
+#print('after sorting:', label_f)
 pickle.dump(label_f, open(os.path.join(save_path, 'label_f.pkl'), 'wb'))
 
 # Step3: use the new label to train network
@@ -187,7 +187,7 @@ def train(epoch, fine=False):
         if fine:
             for idx,target in enumerate(targets):
                 #print(targets[idx], label_f[idx])
-                targets[idx] = int(label_f[idx])
+                targets[idx] = int(label_f[input_idx[idx]])
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         optimizer.zero_grad()
