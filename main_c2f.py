@@ -158,6 +158,12 @@ pickle.dump(label_f, open(os.path.join(save_path, 'label_f.pkl'), 'wb'))
 
 # Step3: use the new label to train network
 # Training
+net = PreActResNet18(num_classes=10*num_clusters)
+if use_cuda:
+    net.cuda()
+    net = torch.nn.DataParallel(net, device_ids=[0])
+    cudnn.benchmark = True
+
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
 regime = {
@@ -168,13 +174,7 @@ regime = {
 }
 logging.info('training regime: %s', regime)
 
-net = PreActResNet18(num_classes=10*num_clusters)
-if use_cuda:
-    net.cuda()
-    net = torch.nn.DataParallel(net, device_ids=[0])
-    cudnn.benchmark = True
-    
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=False, num_workers=2)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
 def train(epoch, fine=False):
     print('\nEpoch: %d' % epoch)
     net.train()
