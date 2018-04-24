@@ -143,15 +143,15 @@ def clustering(train_data, num_clusters):
     cluster_algo.fit(train_data)
     return cluster_algo.labels_.reshape(-1)
 
-label_f = []
+label_f = np.zeros(len(all_targets))
 num_clusters = 2
 for a_class in range(len(classes)):
     idx = (all_targets == a_class)
     label_cur = clustering(train_feats[idx], num_clusters=num_clusters)
     label_cur = label_cur + num_clusters * a_class
-    label_f.append(label_cur)
+    label_f[idx] = label_cur
 
-label_f = np.hstack(label_f)
+#label_f = np.hstack(label_f)
 #print('before sorting:', label_f)
 label_f = label_f[train_idx.argsort()]
 #print('after sorting:', label_f)
@@ -186,7 +186,7 @@ def train(epoch, net_new, trainloader, optimizer, fine=False):
     for batch_idx, (inputs, input_idx, targets) in enumerate(trainloader):
         if fine:
             for idx,target in enumerate(targets):
-                print(targets[idx], int(label_f[input_idx[idx]]))
+                #print(targets[idx], int(label_f[input_idx[idx]]))
                 targets[idx] = int(label_f[input_idx[idx]])
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
