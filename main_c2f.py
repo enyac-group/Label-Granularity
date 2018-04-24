@@ -104,7 +104,7 @@ logging.info("number of parameters: %d", num_parameters)
 
 if use_cuda:
     net.cuda()
-    net = torch.nn.DataParallel(net, device_ids=range(torch.cuda.device_count()))
+    net = torch.nn.DataParallel(net, device_ids=[0])
     cudnn.benchmark = True
 
 
@@ -129,15 +129,23 @@ def get_feat(net, trainloader):
     all_targets = np.hstack(all_targets)
     return all_feats, all_idx, all_targets
 
+   
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=False, num_workers=2)
 train_feats, train_idx, all_targets = get_feat(net, trainloader)
 
 # Step2: cluster the data points per class
+import sklearn.cluster as cls
+
+def clustering(train_data, num_clusters):
+    cluster_algo = cls.SpectralClustering(n_clusters=num_clusters)	
+    cluster_algo.fit(train_data)
+    return cluster_algo.labels_.reshape(-1)
+
 label_f = []
 num_clusters = 2
 for a_class in range(len(classes)):
     idx = (all_targets == a_class)
-    label_cur = cluster(train_feats[idx], num_clusters=num_clusters)
+    label_cur = clustering(train_feats[idx], num_clusters=num_clusters)
     label_cur = label_cur + num_clusters * a_class
     label_f.append(label_cur)
 
@@ -159,7 +167,7 @@ logging.info('training regime: %s', regime)
 net = PreActResNet18(num_classes=10*num_clusters)
 if use_cuda:
     net.cuda()
-    net = torch.nn.DataParallel(net, device_ids=range(torch.cuda.device_count()))
+    net = torch.nn.DataParallel(net, device_ids=[0])
     cudnn.benchmark = True
     
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
