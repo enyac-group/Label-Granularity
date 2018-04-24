@@ -175,7 +175,7 @@ class CIFAR10_RED(data.Dataset):
 
 
 
-class CIFAR100_RED(CIFAR10):
+class CIFAR100_RED(CIFAR10_RED):
     base_folder = 'cifar-100-python'
     url = "http://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz"
     filename = "cifar-100-python.tar.gz"
