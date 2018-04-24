@@ -269,6 +269,6 @@ def test(epoch, net_new, testloader, fine=False, train_f=True):
         best_acc = acc
 
 start_epoch = 0
-for epoch in range(start_epoch, start_epoch+200):
+for epoch in range(start_epoch, start_epoch+300):
     train(epoch, net_new, trainloader, optimizer, fine=True)    
     test(epoch, net_new, testloader, fine=False, train_f=True)
