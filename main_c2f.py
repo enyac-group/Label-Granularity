@@ -188,7 +188,7 @@ def train(epoch, fine=False):
             inputs, targets = inputs.cuda(), targets.cuda()
         optimizer.zero_grad()
         inputs, targets = Variable(inputs), Variable(targets)
-        outputs = net(inputs)
+        outputs, feats = net(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
@@ -221,7 +221,7 @@ def test(epoch, fine=False, train_f=True):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
-        outputs = net(inputs)
+        outputs, feats = net(inputs)
         loss = criterion(outputs, targets)
 
         test_loss += loss.data[0]
