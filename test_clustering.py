@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 
 
-parse = argparse.ArgumentParser(description="Parse pickle file and analyze clustering")
+parser = argparse.ArgumentParser(description="Parse pickle file and analyze clustering")
 parser.add_argument('dir', help='directory of input')
 args = parser.parse_args()
 input_dir = args.dir
