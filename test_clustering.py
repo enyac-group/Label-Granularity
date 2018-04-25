@@ -9,17 +9,17 @@ args = parser.parse_args()
 input_dir = args.dir
 
 
-with open('label_clustered2.pkl', 'r') as f:
-	label_clustered = pickle.load(f)
+# with open('label_clustered2.pkl', 'r') as f:
+# 	label_clustered = pickle.load(f)
 
-with open('label_superclass2.pkl', 'r') as f:
-	label_superclass= pickle.load(f)
+# with open('label_superclass2.pkl', 'r') as f:
+# 	label_superclass= pickle.load(f)
 
-with open('label_true2.pkl') as f:
+with open('results/label_true2.pkl') as f:
 	label_true = pickle.load(f)
 
-with open('label_wisely_clustered2.pkl', 'r') as f:
-	label_wisely_clustered = pickle.load(f)
+with open(os.path.join('results', dir, 'label_f.pkl', 'r') as f:
+	label_clustered = pickle.load(f)
 
 #with open('label_shuffle_clustered2.pkl', 'r') as f:
 #	label_shuffle_clustered = pickle.load(f)
@@ -41,8 +41,8 @@ file_idx = label_superclass[0]
 original_label = label_true[1]
 superclass_mask = label_superclass[1]
 clustered_label = np.array(label_clustered)
-clustered_label_wisely = np.array(label_wisely_clustered)
-clustered_label_shuffle = np.array(label_shuffle_clustered)
+# clustered_label_wisely = np.array(label_wisely_clustered)
+# clustered_label_shuffle = np.array(label_shuffle_clustered)
 
 
 #superclass_0_idx = np.where(superclass_mask == 0)[0]
