@@ -136,33 +136,33 @@ print('feats first row: {}'.format(train_feats[0]))
 #pickle.dump([train_idx, all_targets], open(os.path.join(save_path, 'debug.pkl'), 'wb'))
 pickle.dump([None, all_targets], open(os.path.join(save_path, 'debug.pkl'), 'wb'))
 
-# # Step2: cluster the data points per class
-# import sklearn.cluster as cls
+# Step2: cluster the data points per class
+import sklearn.cluster as cls
 
-# def clustering(train_data, num_clusters):
-#     cluster_algo = cls.SpectralClustering(n_clusters=num_clusters, n_jobs=-1)	
-#     cluster_algo.fit(train_data)
-#     return cluster_algo.labels_.reshape(-1)
+def clustering(train_data, num_clusters):
+    cluster_algo = cls.SpectralClustering(n_clusters=num_clusters, n_jobs=-1)	
+    cluster_algo.fit(train_data)
+    return cluster_algo.labels_.reshape(-1)
 
-# def normalize_c(x):
-#     return (x - x.mean(axis=0)) / x.std(axis=0)
+def normalize_c(x):
+    return (x - x.mean(axis=0)) / x.std(axis=0)
 
-# def normalize_r(x):
-#     return x / np.linalg.norm(x, ord=2, axis=1, keepdims=True)
+def normalize_r(x):
+    return x / np.linalg.norm(x, ord=2, axis=1, keepdims=True)
 
-# label_f = np.zeros(len(all_targets))
-# for a_class in range(NUM_CLASSES):
-#     idx = (all_targets == a_class)
-#     label_cur = clustering(train_feats[idx] / train_feats[idx].max(), num_clusters=NUM_CLUSTERS)
-#     #label_cur = clustering(normalize_c(train_feats[idx]), num_clusters=NUM_CLUSTERS)
-#     label_cur = label_cur + NUM_CLUSTERS * a_class
-#     label_f[idx] = label_cur
+label_f = np.zeros(len(all_targets))
+for a_class in range(NUM_CLASSES):
+    idx = (all_targets == a_class)
+    #label_cur = clustering(train_feats[idx] / train_feats[idx].max(), num_clusters=NUM_CLUSTERS)
+    label_cur = clustering(normalize_c(train_feats[idx]), num_clusters=NUM_CLUSTERS)
+    label_cur = label_cur + NUM_CLUSTERS * a_class
+    label_f[idx] = label_cur
 
-# #label_f = np.hstack(label_f)
-# #print('before sorting:', label_f)
-# label_f = label_f[train_idx.argsort()]
-# #print('after sorting:', label_f)
-# pickle.dump(label_f, open(os.path.join(save_path, 'label_f.pkl'), 'wb'))
+#label_f = np.hstack(label_f)
+#print('before sorting:', label_f)
+label_f = label_f[train_idx.argsort()]
+#print('after sorting:', label_f)
+pickle.dump(label_f, open(os.path.join(save_path, 'label_f.pkl'), 'wb'))
 
 # # Step3: use the new label to train network
 # # Training
