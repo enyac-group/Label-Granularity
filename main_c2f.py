@@ -70,7 +70,7 @@ trainset = dataset.data_cifar10_red.CIFAR10_RED(root='/home/rzding/DATA', train=
 
 testset = dataset.data_cifar10_red.CIFAR10_RED(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
 #testset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
-testloader = torch.utils.data.DataLoader(testset, batch_size=50, shuffle=False, num_workers=2)
+testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False, num_workers=2)
 
 # Model
 if args.resume:
@@ -127,7 +127,7 @@ def get_feat(net, trainloader):
     return all_feats, all_idx, all_targets
 
 
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=32, shuffle=False, num_workers=2)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=False, num_workers=2)
 train_feats, train_idx, all_targets = get_feat(net, trainloader)
 print('all feats size: {}'.format(train_feats.shape))
 print('feats sum: {}'.format(train_feats.sum(axis=1)))
@@ -179,7 +179,7 @@ regime = {
 }
 logging.info('training regime: %s', regime)
 
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=32, shuffle=True, num_workers=2)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
 def train(epoch, net_new, trainloader, optimizer, fine=False):
     print('\nEpoch: %d' % epoch)
     net_new.train()

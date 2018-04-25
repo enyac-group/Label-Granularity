@@ -137,7 +137,7 @@ class CIFAR10_RED(data.Dataset):
         # map target
         target = self.classes_f2c[target]
 
-        return img, index, target
+        return np.asarray(img), index, target
 
 
     def __len__(self):
