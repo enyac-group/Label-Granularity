@@ -153,7 +153,7 @@ def normalize_r(x):
 label_f = np.zeros(len(all_targets))
 for a_class in range(NUM_CLASSES):
     idx = (all_targets == a_class)
-    label_cur = clustering(train_feats[idx], num_clusters=NUM_CLUSTERS)
+    label_cur = clustering(train_feats[idx] / train_feats[idx].max(), num_clusters=NUM_CLUSTERS)
     #label_cur = clustering(normalize_c(train_feats[idx]), num_clusters=NUM_CLUSTERS)
     label_cur = label_cur + NUM_CLUSTERS * a_class
     label_f[idx] = label_cur
