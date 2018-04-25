@@ -1,6 +1,7 @@
 import argparse
 import pickle
 import numpy as np
+import os
 
 
 parser = argparse.ArgumentParser(description="Parse pickle file and analyze clustering")
