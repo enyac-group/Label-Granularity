@@ -19,7 +19,7 @@ input_dir = args.dir
 with open('results/label_true2.pkl') as f:
 	label_true = pickle.load(f)
 
-with open(os.path.join('results', dir, 'label_f.pkl'), 'r') as f:
+with open(os.path.join('results', input_dir, 'label_f.pkl'), 'r') as f:
 	label_clustered = pickle.load(f)
 
 #with open('label_shuffle_clustered2.pkl', 'r') as f:
