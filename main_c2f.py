@@ -145,7 +145,8 @@ def clustering(train_data, num_clusters):
     return cluster_algo.labels_.reshape(-1)
 
 def normalize_c(x):
-    return (x - x.mean(axis=0)) / x.std(axis=0)
+    #return (x - x.mean(axis=0)) / x.std(axis=0)
+    return x / np.linalg.norm(x, ord=2, axis=0, keepdims=True)
 
 def normalize_r(x):
     return x / np.linalg.norm(x, ord=2, axis=1, keepdims=True)
@@ -154,7 +155,7 @@ label_f = np.zeros(len(all_targets))
 for a_class in range(NUM_CLASSES):
     idx = (all_targets == a_class)
     #label_cur = clustering(train_feats[idx] / train_feats[idx].max(), num_clusters=NUM_CLUSTERS)
-    label_cur = clustering(normalize_r(train_feats[idx]), num_clusters=NUM_CLUSTERS)
+    label_cur = clustering(normalize_c(train_feats[idx]), num_clusters=NUM_CLUSTERS)
     label_cur = label_cur + NUM_CLUSTERS * a_class
     label_f[idx] = label_cur
 
