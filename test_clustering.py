@@ -52,7 +52,7 @@ print 'Results from ',input_dir
 hist_2D = []
 for class_idx in range(int(max(original_label))+1):
 	origin_class_k_idx = np.where(original_label == class_idx)[0]
-	hist,bin_edges = np.histogram(clustered_label[origin_class_k_idx], bins=np.arange(max(original_label)+1))
+	hist,bin_edges = np.histogram(clustered_label[origin_class_k_idx], bins=np.arange(max(original_label)+2))
 	hist_2D.append(hist)
 	print 'original class ', class_idx, ': ', hist, ' row sum: ', sum(hist), 'max idx: ', np.argmax(hist)
 print 'Sum of columns: ', np.sum(np.array(hist_2D), axis=0)
