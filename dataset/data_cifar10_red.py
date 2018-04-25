@@ -54,11 +54,11 @@ class CIFAR10_RED(data.Dataset):
         #classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
         classes_f2c = {}
         for idx,a_class in enumerate(classes):
-            #if a_class in ['bird', 'plane', 'car', 'ship', 'truck']:
-            if a_class in ['bird', 'deer', 'car', 'frog', 'truck']:
+            if a_class in ['bird', 'plane', 'car', 'ship', 'truck']:
+            #if a_class in ['bird', 'deer', 'car', 'frog', 'truck']:
                 classes_f2c[idx] = 0
-            #elif a_class in ['cat', 'deer', 'dog', 'frog', 'horse']:
-            elif a_class in ['cat', 'plane', 'dog', 'ship', 'horse']:
+            elif a_class in ['cat', 'deer', 'dog', 'frog', 'horse']:
+            #elif a_class in ['cat', 'plane', 'dog', 'ship', 'horse']:
                 classes_f2c[idx] = 1
         self.classes_f2c = classes_f2c
 
