@@ -38,9 +38,9 @@ with open(os.path.join('results', input_dir, 'label_f.pkl'), 'r') as f:
 ## superclass0:'bird','plane','car','ship','truck'
 ## superclass1:'cat','deer','dog','frog','horse'
 
-file_idx = label_superclass[0]
+#file_idx = label_superclass[0]
 original_label = label_true[1]
-superclass_mask = label_superclass[1]
+#superclass_mask = label_superclass[1]
 clustered_label = np.array(label_clustered)
 # clustered_label_wisely = np.array(label_wisely_clustered)
 # clustered_label_shuffle = np.array(label_shuffle_clustered)
