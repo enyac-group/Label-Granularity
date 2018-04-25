@@ -49,8 +49,8 @@ clustered_label = np.array(label_clustered)
 #superclass_0_idx = np.where(superclass_mask == 0)[0]
 
 print 'Results from ',input_dir
+hist_2D = []
 for class_idx in range(int(max(original_label))+1):
-	hist_2D = []
 	origin_class_k_idx = np.where(original_label == class_idx)[0]
 	hist,bin_edges = np.histogram(clustered_label[origin_class_k_idx], bins=np.arange(max(original_label)+1))
 	hist_2D.append(hist)
