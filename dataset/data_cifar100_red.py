@@ -14,7 +14,7 @@ import torch.utils.data as data
 from .data_utils import download_url, check_integrity
 
 
-class CIFAR10_RED(data.Dataset):
+class CIFAR100_RED(data.Dataset):
     """`CIFAR10 <https://www.cs.toronto.edu/~kriz/cifar.html>`_ Dataset.
 
     Args:
@@ -31,35 +31,79 @@ class CIFAR10_RED(data.Dataset):
             downloaded again.
 
     """
-    base_folder = 'cifar-10-batches-py'
-    url = "http://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
-    filename = "cifar-10-python.tar.gz"
-    tgz_md5 = 'c58f30108f718f92721af3b95e74349a'
+
+    base_folder = 'cifar-100-python'
+    url = "http://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz"
+    filename = "cifar-100-python.tar.gz"
+    tgz_md5 = 'eb9058c3a382ffc7106e4002c42a8d85'
     train_list = [
-        ['data_batch_1', 'c99cafc152244af753f735de768cd75f'],
-        ['data_batch_2', 'd4bba439e000b95fd0a9bffe97cbabec'],
-        ['data_batch_3', '54ebc095f3ab1f0389bbae665268c751'],
-        ['data_batch_4', '634d18415352ddfa80567beed471001a'],
-        ['data_batch_5', '482c414d41f54cd18b22e5b47cb7c3cb'],
+        ['train', '16019d7e3df5f24257cddd939b257f8d'],
     ]
 
     test_list = [
-        ['test_batch', '40351d587109b95175f43aff81a1287e'],
+        ['test', 'f0ef6b0ae62326f3e7ffdfab6717acfc'],
     ]
 
     def __init__(self, root, train=True,
                  transform=None, target_transform=None,
                  download=False):
-        classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-        #classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+
+        coarse_classes = ('aquatic_mammals', 'fish', 'flowers', 'food_containers', 
+                'fruit_and_vegetables', 'household_electrical_devices', 
+                'household_furniture', 'insects', 'large_carnivores', 
+                'large_man-made_outdoor_things', 'large_natural_outdoor_scenes', 
+                'large_omnivores_and_herbivores', 'medium_mammals', 
+                'non-insect_invertebrates', 'people', 'reptiles', 'small_mammals', 
+                'trees', 'vehicles_1', 'vehicles_2')
+
+        fine_classes = ('apple', 'aquarium_fish', 'baby', 'bear', 'beaver', 'bed', 'bee', 
+                        'beetle', 'bicycle', 'bottle', 'bowl', 'boy', 'bridge', 'bus', 
+                        'butterfly', 'camel', 'can', 'castle', 'caterpillar', 'cattle', 
+                        'chair', 'chimpanzee', 'clock', 'cloud', 'cockroach', 'couch', 
+                        'crab', 'crocodile', 'cup', 'dinosaur', 'dolphin', 'elephant', 
+                        'flatfish', 'forest', 'fox', 'girl', 'hamster', 'house', 
+                        'kangaroo', 'keyboard', 'lamp', 'lawn_mower', 'leopard', 'lion', 
+                        'lizard', 'lobster', 'man', 'maple_tree', 'motorcycle', 
+                        'mountain', 'mouse', 'mushroom', 'oak_tree', 'orange', 'orchid', 
+                        'otter', 'palm_tree', 'pear', 'pickup_truck', 'pine_tree', 
+                        'plain', 'plate', 'poppy', 'porcupine', 'possum', 'rabbit', 
+                        'raccoon', 'ray', 'road', 'rocket', 'rose', 'sea', 'seal', 
+                        'shark', 'shrew', 'skunk', 'skyscraper', 'snail', 'snake', 
+                        'spider', 'squirrel', 'streetcar', 'sunflower', 'sweet_pepper', 
+                        'table', 'tank', 'telephone', 'television', 'tiger', 'tractor', 
+                        'train', 'trout', 'tulip', 'turtle', 'wardrobe', 'whale', 
+                        'willow_tree', 'wolf', 'woman', 'worm')
+
+        classes_c2f = {'aquatic_mammals': ['beaver','dolphin','otter','seal','whale'], 
+                        'fish': ['aquarium_fish','flatfish','ray','shark','trout'], 
+                        'flowers': ['orchid','poppy','rose','sunflower','tulip'], 
+                        'food_containers': ['bottle','bowl','can','cup','plate'], 
+                        'fruit_and_vegetables': ['apple','mushroom','orange','pear','sweet_pepper'], 
+                        'household_electrical_devices': ['clock','keyboard','lamp','telephone','television'], 
+                        'household_furniture': ['bed','chair','couch','table','wardrobe'], 
+                        'insects': ['bee','beetle','butterfly','caterpillar','cockroach'], 
+                        'large_carnivores': ['bear','leopard','lion','tiger','wolf'], 
+                        'large_man-made_outdoor_things': ['bridge','castle','house','road','skyscraper'], 
+                        'large_natural_outdoor_scenes': ['cloud','forest','mountain','plain','sea'], 
+                        'large_omnivores_and_herbivores': ['camel','cattle','chimpanzee','elephant','kangaroo'], 
+                        'medium_mammals': ['fox','porcupine','possum','raccoon','skunk'], 
+                        'non-insect_invertebrates': ['crab','lobster','snail','spider','worm'], 
+                        'people': ['baby','boy','girl','man','woman'], 
+                        'reptiles': ['crocodile','dinosaur','lizard','snake','turtle'], 
+                        'small_mammals': ['hamster','mouse','rabbit','shrew','squirrel'], 
+                        'trees': ['maple_tree','oak_tree','palm_tree','pine_tree','willow_tree'], 
+                        'vehicles_1': ['bicycle','bus','motorcycle','pickup_truck','train'], 
+                        'vehicles_2': ['lawn_mower','rocket','streetcar','tank','tractor']}
+
         classes_f2c = {}
-        for idx,a_class in enumerate(classes):
-            if a_class in ['bird', 'plane', 'car', 'ship', 'truck']:
-            #if a_class in ['bird', 'deer', 'car', 'frog', 'truck']:
-                classes_f2c[idx] = 0
-            elif a_class in ['cat', 'deer', 'dog', 'frog', 'horse']:
-            #elif a_class in ['cat', 'plane', 'dog', 'ship', 'horse']:
-                classes_f2c[idx] = 1
+        for idx,f_class in enumerate(fine_classes):
+            for jdx,c_class in enumerate(coarse_classes):
+                if f_class in classes_c2f[c_class]:
+                    classes_f2c[idx] = jdx
+            if idx not in classes_f2c:
+                print(idx)
+                raise ValueError()
+
         self.classes_f2c = classes_f2c
 
         self.root = os.path.expanduser(root)
@@ -174,5 +218,4 @@ class CIFAR10_RED(data.Dataset):
         tar.extractall()
         tar.close()
         os.chdir(cwd)
-
 

@@ -23,6 +23,9 @@ from torch.autograd import Variable
 from datetime import datetime
 import logging
 
+NUM_CLASSES = 2
+NUM_CLUSTERS = 5
+
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR100 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -142,7 +145,7 @@ else:
     # net = VGG('VGG19')
     # net = ResNet18()
     #net = PreActResNet18(num_classes=100)
-    net = wide_resnet(num_classes=20)
+    net = wide_resnet(num_classes=100)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
@@ -266,8 +269,8 @@ def test(epoch, f2c=False, train_f=True):
 
 
 for epoch in range(start_epoch, start_epoch+200):
-    train(epoch, f2c=True)
-    #test(epoch, f2c=False)
-    test(epoch, f2c=True, train_f=False)
+    train(epoch, f2c=False)
+    test(epoch, f2c=False)
+    test(epoch, f2c=True, train_f=True)
 
 # test(0, f2c=True, train_f=True)
