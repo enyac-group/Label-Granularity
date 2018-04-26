@@ -15,6 +15,17 @@ python main_c2f_resume.py --resume --resume_dir results/2018-04-24_21-12-54
 
 CUDA_VISIBLE_DEVICES=0 nohup python main_f2c_cifar100.py &
 
+
+
+# Feature trained on CIFAR-100 100
+python main_c2f_cifar100.py --resume --resume_dir results/2018-04-26_00-15-11
+
+# Feature trained on CIFAR-100 20
+python main_c2f_cifar100.py --resume --resume_dir results/2018-04-25_19-48-32
+
+
+
+
 # Train CIFAR10 with PyTorch
 
 I'm playing with [PyTorch](http://pytorch.org/) on the CIFAR10 dataset.
