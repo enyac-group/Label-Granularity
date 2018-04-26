@@ -13,6 +13,7 @@ import torch.backends.cudnn as cudnn
 
 import torchvision
 import torchvision.transforms as transforms
+import dataset 
 
 import os
 import argparse
@@ -22,6 +23,8 @@ from utils import progress_bar, adjust_optimizer, setup_logging
 from torch.autograd import Variable
 from datetime import datetime
 import logging
+import numpy as np
+import pickle
 
 NUM_CLASSES = 2
 NUM_CLUSTERS = 5

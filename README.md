@@ -18,10 +18,10 @@ CUDA_VISIBLE_DEVICES=0 nohup python main_f2c_cifar100.py &
 
 
 # Feature trained on CIFAR-100 100
-python main_c2f.py --resume --resume_dir results/2018-04-26_00-15-11
+python main_c2f_cifar100.py --resume --resume_dir results/2018-04-26_00-15-11
 
 # Feature trained on CIFAR-100 20
-python main_c2f.py --resume --resume_dir results/2018-04-25_19-48-32
+python main_c2f_cifar100.py --resume --resume_dir results/2018-04-25_19-48-32
 
 
 
