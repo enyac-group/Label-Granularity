@@ -78,9 +78,10 @@ class Wide_ResNet(nn.Module):
         out = F.relu(self.bn1(out))
         out = F.avg_pool2d(out, 8)
         out = out.view(out.size(0), -1)
+        feat = out
         out = self.linear(out)
 
-        return out
+        return out, feat
 
 def wide_resnet(num_classes=10):
     return Wide_ResNet(depth=28, widen_factor=10, dropout_rate=0.3, num_classes=num_classes)
