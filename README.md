@@ -2,11 +2,15 @@ python main_f2c.py --resume --resume_dir results/2018-04-23_03-38-31
 
 python main_f2c.py
 
+# Feature trained on 10
 python main_c2f.py --resume --resume_dir results/2018-04-23_03-38-31
+
+# Feature trained on 2
+python main_c2f.py --resume --resume_dir results/2018-04-23_16-45-22
 
 python main_c2f_resume.py --resume --resume_dir results/2018-04-24_21-12-54
 
-CUDA_VISIBLE_DEVICES=1 nohup python main_f2c_cifar100.py &
+CUDA_VISIBLE_DEVICES=0 nohup python main_f2c_cifar100.py &
 
 # Train CIFAR10 with PyTorch
 
