@@ -58,6 +58,7 @@ for class_idx in range(int(max(original_label))+1):
 print 'Sum of columns: ', np.sum(np.array(hist_2D), axis=0)
 	#print bin_edges
 
+
 #print 'labels from train 10 correct 5:5 partition'
 #for class_idx in range(int(max(original_label))+1):
 #	origin_class_k_idx = np.where(original_label == class_idx)[0]
