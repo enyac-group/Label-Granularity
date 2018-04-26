@@ -38,21 +38,15 @@ parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
 parser.add_argument('--resume_dir', default=None, help='resume dir')
 args = parser.parse_args()
 
+
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-if args.resume_dir is None:
-    print('resume_dir is None')
-    save_path = os.path.join(args.results_dir, args.save)
-else:
-    print('resume_dir is not None')
-    save_path = args.resume_dir
+save_path = os.path.join(args.results_dir, args.save)
 if not os.path.exists(save_path):
     os.makedirs(save_path)
-if args.resume_dir is None:
-    setup_logging(os.path.join(save_path, 'log.txt'))
-else:
-    setup_logging(os.path.join(save_path, 'log_eval.txt'))
+setup_logging(os.path.join(save_path, 'log.txt'))
 logging.info("saving to %s", save_path)
 logging.info("run arguments: %s", args)
+
 
 use_cuda = torch.cuda.is_available()
 best_acc = 0  # best test accuracy
