@@ -31,7 +31,7 @@ args = parser.parse_args()
 #save_path = os.path.join(args.results_dir, args.save)
 #if not os.path.exists(save_path):
 #    os.makedirs(save_path)
-save_path = args.results_dir
+save_path = args.resume_dir
 
 checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
 
