@@ -182,7 +182,7 @@ class CIFAR100_RED(data.Dataset):
 
         # map target
         #target = self.classes_f2c[target]
-        print(target)
+        #print(target)
         return np.asarray(img), index, target
 
 
