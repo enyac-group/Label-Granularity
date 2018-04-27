@@ -21,6 +21,7 @@ import logging
 import numpy as np
 import pickle
 
+parser = argparse.ArgumentParser(description='Getting params')
 parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
                     help='results dir')
 parser.add_argument('--resume_dir', default=None, help='resume dir')
