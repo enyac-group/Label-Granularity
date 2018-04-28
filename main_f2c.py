@@ -30,6 +30,7 @@ parser.add_argument('--resume', '-r', action='store_true', help='resume from che
 parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
                     help='results dir')
 parser.add_argument('--resume_dir', default=None, help='resume dir')
+parser.add_argument('--superclass', default=None, help='one of the super class')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -74,12 +75,21 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False,
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 #classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+# classes_f2c = {}
+# for idx,a_class in enumerate(classes):
+#     if a_class in ['bird', 'plane', 'car', 'ship', 'truck']:
+#         classes_f2c[idx] = 0
+#     elif a_class in ['cat', 'deer', 'dog', 'frog', 'horse']:
+#         classes_f2c[idx] = 1
+
+# default is 01289
 classes_f2c = {}
-for idx,a_class in enumerate(classes):
-    if a_class in ['bird', 'plane', 'car', 'ship', 'truck']:
-        classes_f2c[idx] = 0
-    elif a_class in ['cat', 'deer', 'dog', 'frog', 'horse']:
-        classes_f2c[idx] = 1
+for i in range(len(classes)):
+    if str(i) in args.superclass:
+        classes_f2c[i] = 0
+    else:
+        classes_f2c[i] = 1
+logging.info("classes_f2c: {}".format(classes_f2c))
 
 # Model
 if args.resume:
