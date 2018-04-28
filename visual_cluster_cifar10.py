@@ -67,12 +67,12 @@ for fine in fine_classes:
 			f2c_idx_map.append(coarse_classes.index(coarse_label))
 			break
 
-cifar100_100on20_label = np.zeros(cifar100_100_label.shape)
-for idx, label in enumerate(list(cifar100_100_label)):
-	cifar100_100on20_label[idx] = (f2c_idx_map[int(label)])
-
+#cifar100_100on20_label = np.zeros(cifar100_100_label.shape)
+#for idx, label in enumerate(list(cifar100_100_label)):
+#	cifar100_100on20_label[idx] = (f2c_idx_map[int(label)])
+#
 print set(list(cifar100_100_label))
-print set(list(cifar100_100on20_label))
+#print set(list(cifar100_100on20_label))
 print set(list(cifar100_20_label))
 
 
@@ -114,6 +114,7 @@ plot_data=1
 plot_density=1
 
 def plot_fig(x, y, label, mean=[],  filename='noname.jpg'):
+	plt.figure()
 	plt.scatter(x, y, c=label, cmap=plt.cm.Spectral)
 	plt.scatter(mean[0], mean[1], s=100, c='r', marker='^')
 	plt.savefig(filename)
@@ -129,17 +130,24 @@ if plot_data:
 	print 'Plotting projected data...'
 	plot_fig(cifar100_100_fc7_rwn1_embedded[:-12,0], cifar100_100_fc7_rwn1_embedded[:-12,1], mean=[cifar100_100_fc7_rwn1_embedded[-12:-2,0], cifar100_100_fc7_rwn1_embedded[-12:-2,1]], label=cifar100_100_label[shuffle_idx],filename='cifar10_10_fc7_rwn1_TSNE_sample-{0}.jpg'.format(sample_size))
 
-	plot_fig(cifar100_100_fc7_rwn1_embedded[:-12,0], cifar100_100_fc7_rwn1_embedded[:-12,1], label=cifar100_100on20_label[shuffle_idx], mean=[cifar100_100_fc7_rwn1_embedded[-2:,0], cifar100_100_fc7_rwn1_embedded[-2:,1]],  filename='cifar10_10on2_fc7_rwn1_TSNE_sample-{0}.jpg'.format(sample_size))
+	plot_fig(cifar100_100_fc7_rwn1_embedded[:-12,0], cifar100_100_fc7_rwn1_embedded[:-12,1], label=cifar100_20_label[shuffle_idx], mean=[cifar100_100_fc7_rwn1_embedded[-2:,0], cifar100_100_fc7_rwn1_embedded[-2:,1]],  filename='cifar10_10on2_fc7_rwn1_TSNE_sample-{0}.jpg'.format(sample_size))
 
 	plot_fig(cifar100_20_fc7_rwn1_embedded[:-2,0], cifar100_20_fc7_rwn1_embedded[:-2,1], label=cifar100_20_label[shuffle_idx], mean=[cifar100_20_fc7_rwn1_embedded[-2:,0], cifar100_20_fc7_rwn1_embedded[-2:,1]], filename='cifar10_2_fc7_rwn1_TSNE_sample-{0}.jpg'.format(sample_size))
 
 if plot_density:
 	print 'Plotting density...'
-	#temp_label = cifar100_100_label[shuffle_idx]
-	#for i in range(10):
-	#	temp_idx = (temp_label == i)
-	plot_density(cifar100_100_fc7_rwn1_embedded[:-12,0], cifar100_100_fc7_rwn1_embedded[:-12,1], mean=[cifar100_100_fc7_rwn1_embedded[-12:-2,0], cifar100_100_fc7_rwn1_embedded[-12:-2,1]], filename='cifar10_10_fc7_rwn1_TSNE_sample-{0}_density.jpg'.format(sample_size))
+	temp_label = cifar100_100_label[shuffle_idx]
+	for i in range(10):
+		temp_idx = (temp_label == i)
+		plot_density(cifar100_100_fc7_rwn1_embedded[temp_idx,0], cifar100_100_fc7_rwn1_embedded[temp_idx,1], mean=[cifar100_100_fc7_rwn1_embedded[-12+i,0], cifar100_100_fc7_rwn1_embedded[-12+i,1]], filename='cifar10_10_fc7_rwn1_TSNE_sample-{0}_density_class{1}.jpg'.format(sample_size,i))
 	#print cifar100_100_fc7_rwn1_embedded[-2:,0], cifar100_100_fc7_rwn1_embedded[-2:,1]
-	plot_density(cifar100_100_fc7_rwn1_embedded[:-12,0], cifar100_100_fc7_rwn1_embedded[:-12,1], mean=[cifar100_100_fc7_rwn1_embedded[-2:,0], cifar100_100_fc7_rwn1_embedded[-2:,1]], filename='cifar10_10on2_fc7_rwn1_TSNE_sample-{0}_density.jpg'.format(sample_size))
-	plot_density(cifar100_20_fc7_rwn1_embedded[:-2,0], cifar100_20_fc7_rwn1_embedded[:-2,1], mean=[cifar100_20_fc7_rwn1_embedded[-2:,0], cifar100_20_fc7_rwn1_embedded[-2:,1]], filename='cifar10_2_fc7_rwn1_TSNE_sample-{0}_density.jpg'.format(sample_size))
+
+	plot_density(cifar100_100_fc7_rwn1_embedded[:-12,0], cifar100_100_fc7_rwn1_embedded[:-12,1], mean=[cifar100_100_fc7_rwn1_embedded[-12:-2,0], cifar100_100_fc7_rwn1_embedded[-12:-2,1]], filename='cifar10_10_fc7_rwn1_TSNE_sample-{0}_density_allclass.jpg'.format(sample_size))
+	
+	temp_label = cifar100_20_label[shuffle_idx]
+	for i in range(2):
+		temp_idx = (temp_label == i)
+		plot_density(cifar100_100_fc7_rwn1_embedded[temp_idx,0], cifar100_100_fc7_rwn1_embedded[temp_idx,1], mean=[cifar100_100_fc7_rwn1_embedded[-2+i:,0], cifar100_100_fc7_rwn1_embedded[-2+i:,1]], filename='cifar10_10on2_fc7_rwn1_TSNE_sample-{0}_density_class{1}.jpg'.format(sample_size,i))
+
+		plot_density(cifar100_20_fc7_rwn1_embedded[temp_idx,0], cifar100_20_fc7_rwn1_embedded[temp_idx,1], mean=[cifar100_20_fc7_rwn1_embedded[-2+i:,0], cifar100_20_fc7_rwn1_embedded[-2+i:,1]], filename='cifar10_2_fc7_rwn1_TSNE_sample-{0}_density_class{1}.jpg'.format(sample_size,i))
 
