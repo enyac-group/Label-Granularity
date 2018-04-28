@@ -31,6 +31,7 @@ parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
                     help='results dir')
 parser.add_argument('--resume_dir', default=None, help='resume dir')
 parser.add_argument('--superclass', default=None, help='one of the super class')
+parser.add_argument('--gpus', default='0', help='gpus used')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -120,7 +121,7 @@ logging.info("number of parameters: %d", num_parameters)
 
 if use_cuda:
     net.cuda()
-    net = torch.nn.DataParallel(net, device_ids=[0])
+    net = torch.nn.DataParallel(net, device_ids=[int(ele) for ele in args.gpus])
     cudnn.benchmark = True
 
 criterion = nn.CrossEntropyLoss()
