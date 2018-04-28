@@ -121,6 +121,7 @@ logging.info("number of parameters: %d", num_parameters)
 
 if use_cuda:
     net.cuda()
+    logging.info('gpus: {}'.format([int(ele) for ele in args.gpus]))
     net = torch.nn.DataParallel(net, device_ids=[int(ele) for ele in args.gpus])
     cudnn.benchmark = True
 
