@@ -22,6 +22,7 @@ from utils import progress_bar, adjust_optimizer, setup_logging
 from torch.autograd import Variable
 from datetime import datetime
 import logging
+import numpy as np
 
 NUM_CLASSES = 100
 
@@ -128,6 +129,15 @@ for idx,f_class in enumerate(fine_classes):
     if idx not in classes_f2c:
         print(idx)
         raise ValueError()
+
+# Randomly re-define super classes
+for i in range(50):
+    idx = np.random.randint(0, 100)
+    jdx = np.random.randint(0, 100)
+    classes_f2c[idx], classes_f2c[jdx] = classes_f2c[jdx], classes_f2c[idx]
+pickle.dump(classes_f2c, open(os.path.join(save_path, 'classes_f2c.pkl'), 'wb'))
+logging.info('classes_f2c: {}'.format(classes_f2c))
+
 
 # Model
 if args.resume:
@@ -267,8 +277,8 @@ def test(epoch, f2c=False, train_f=True):
 
 
 for epoch in range(start_epoch, start_epoch+200):
-    #train(epoch, f2c=False)
-    test(epoch, f2c=False)
-    #test(epoch, f2c=True, train_f=True)
+    train(epoch, f2c=True)
+    #test(epoch, f2c=False)
+    test(epoch, f2c=True, train_f=False)
 
 # test(0, f2c=True, train_f=True)
