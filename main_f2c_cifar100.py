@@ -131,13 +131,16 @@ for idx,f_class in enumerate(fine_classes):
         print(idx)
         raise ValueError()
 
-# Randomly re-define super classes
-for i in range(50):
-    idx = np.random.randint(0, 100)
-    jdx = np.random.randint(0, 100)
-    classes_f2c[idx], classes_f2c[jdx] = classes_f2c[jdx], classes_f2c[idx]
-pickle.dump(classes_f2c, open(os.path.join(save_path, 'classes_f2c.pkl'), 'wb'))
-logging.info('classes_f2c: {}'.format(classes_f2c))
+# # Randomly re-define super classes
+# for i in range(50):
+#     idx = np.random.randint(0, 100)
+#     jdx = np.random.randint(0, 100)
+#     classes_f2c[idx], classes_f2c[jdx] = classes_f2c[jdx], classes_f2c[idx]
+# pickle.dump(classes_f2c, open(os.path.join(save_path, 'classes_f2c.pkl'), 'wb'))
+# logging.info('classes_f2c: {}'.format(classes_f2c))
+
+# load classes_f2c from pkl
+classes_f2c = pickle.load(open('results/2018-04-30_13-58-59/classes_f2c.pkl', 'rb'))
 
 
 # Model
@@ -277,9 +280,9 @@ def test(epoch, f2c=False, train_f=True):
 
 
 
-for epoch in range(start_epoch, start_epoch+200):
-    train(epoch, f2c=True)
-    #test(epoch, f2c=False)
-    test(epoch, f2c=True, train_f=False)
+# for epoch in range(start_epoch, start_epoch+200):
+#     train(epoch, f2c=True)
+#     #test(epoch, f2c=False)
+#     test(epoch, f2c=True, train_f=False)
 
-# test(0, f2c=True, train_f=True)
+test(0, f2c=True, train_f=True)
