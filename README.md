@@ -14,6 +14,7 @@ python test_clustering.py 2018-04-25_21-30-19
 python main_c2f_resume.py --resume --resume_dir results/2018-04-24_21-12-54
 
 CUDA_VISIBLE_DEVICES=0 nohup python main_f2c_cifar100.py &
+CUDA_VISIBLE_DEVICES=1 python main_f2c_cifar100.py --resume --resume_dir results/2018-04-23_20-08-25
 
 
 

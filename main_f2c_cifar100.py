@@ -141,7 +141,7 @@ for idx,f_class in enumerate(fine_classes):
 
 # load classes_f2c from pkl
 classes_f2c = pickle.load(open('results/2018-04-30_13-58-59/classes_f2c.pkl', 'rb'))
-
+logging.info('loading classes_f2c from: {}'.format('2018-04-30_13-58-59'))
 
 # Model
 if args.resume:
