@@ -25,7 +25,7 @@ import logging
 import numpy as np
 import pickle
 
-NUM_CLASSES = 100
+NUM_CLASSES = 20
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR100 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -201,7 +201,7 @@ def train(epoch, f2c=False):
             inputs, targets = inputs.cuda(), targets.cuda()
         optimizer.zero_grad()
         inputs, targets = Variable(inputs), Variable(targets)
-        outputs = net(inputs)
+        outputs, feat = net(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
@@ -235,7 +235,7 @@ def test(epoch, f2c=False, train_f=True):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
-        outputs = net(inputs)
+        outputs, feat = net(inputs)
         loss = criterion(outputs, targets)
 
         test_loss += loss.data[0]
