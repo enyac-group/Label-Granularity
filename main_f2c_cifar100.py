@@ -23,6 +23,7 @@ from torch.autograd import Variable
 from datetime import datetime
 import logging
 import numpy as np
+import pickle
 
 NUM_CLASSES = 100
 
