@@ -74,6 +74,7 @@ class PreActResNet(nn.Module):
         self.layer2 = self._make_layer(block, self.in_planes*2, num_blocks[1], stride=2)
         self.layer3 = self._make_layer(block, self.in_planes*4, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, self.in_planes*8, num_blocks[3], stride=2)
+        print('in_planes: {}'.format(self.in_planes))
         print('linear input dim: {}'.format(self.in_planes*8*block.expansion))
         self.linear = nn.Linear(self.in_planes*8*block.expansion, num_classes)
 
