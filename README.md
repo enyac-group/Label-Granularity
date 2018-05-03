@@ -1,6 +1,6 @@
 python main_f2c.py --resume --resume_dir results/2018-04-23_03-38-31 
 
-python main_f2c.py
+CUDA_VISIBLE_DEVICES=1 python main_f2c.py
 
 # Feature trained on 10
 python main_c2f.py --resume --resume_dir results/2018-04-23_03-38-31
