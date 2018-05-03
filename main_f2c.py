@@ -76,21 +76,21 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False,
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 #classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-# classes_f2c = {}
-# for idx,a_class in enumerate(classes):
-#     if a_class in ['bird', 'plane', 'car', 'ship', 'truck']:
-#         classes_f2c[idx] = 0
-#     elif a_class in ['cat', 'deer', 'dog', 'frog', 'horse']:
-#         classes_f2c[idx] = 1
+classes_f2c = {}
+for idx,a_class in enumerate(classes):
+    if a_class in ['plane', 'car', 'ship', 'truck']:
+        classes_f2c[idx] = 0
+    elif a_class in ['bird', 'cat', 'deer', 'dog', 'frog', 'horse']:
+        classes_f2c[idx] = 1
 
 # default is 01289
-classes_f2c = {}
-for i in range(len(classes)):
-    if str(i) in args.superclass:
-        classes_f2c[i] = 0
-    else:
-        classes_f2c[i] = 1
-logging.info("classes_f2c: {}".format(classes_f2c))
+# classes_f2c = {}
+# for i in range(len(classes)):
+#     if str(i) in args.superclass:
+#         classes_f2c[i] = 0
+#     else:
+#         classes_f2c[i] = 1
+# logging.info("classes_f2c: {}".format(classes_f2c))
 
 # Model
 if args.resume:
@@ -105,7 +105,7 @@ else:
     print('==> Building model..')
     # net = VGG('VGG19')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=2)
+    net = PreActResNet18(num_classes=10, thickness=16)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
@@ -127,11 +127,17 @@ if use_cuda:
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
+# regime = {
+#     0: {'optimizer': 'SGD', 'lr': 1e-1,
+#         'weight_decay': 5e-4, 'momentum': 0.9},
+#     150: {'lr': 1e-2},
+#     250: {'lr': 1e-3}
+# }
 regime = {
     0: {'optimizer': 'SGD', 'lr': 1e-1,
         'weight_decay': 5e-4, 'momentum': 0.9},
-    150: {'lr': 1e-2},
-    250: {'lr': 1e-3}
+    100: {'lr': 1e-2},
+    150: {'lr': 1e-3}
 }
 logging.info('training regime: %s', regime)
 
@@ -228,9 +234,9 @@ def test(epoch, f2c=False, train_f=True):
 
 
 
-# for epoch in range(start_epoch, start_epoch+200):
-#     train(epoch, f2c=True)
-#     #test(epoch, f2c=False)
-#     test(epoch, f2c=True, train_f=False)
+for epoch in range(start_epoch, start_epoch+200):
+    train(epoch, f2c=False)
+    test(epoch, f2c=False)
+    test(epoch, f2c=True, train_f=True)
 
-test(0, f2c=True, train_f=True)
+# test(0, f2c=True, train_f=True)
