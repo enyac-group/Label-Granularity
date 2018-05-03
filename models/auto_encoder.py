@@ -20,10 +20,10 @@ class autoencoder(nn.Module):
             nn.MaxPool2d(2, stride=2),  # b, 16, 16, 16
             nn.Conv2d(16, 8, 3, stride=1, padding=1),  # b, 8, 16, 16
             nn.ReLU(True),
-            nn.MaxPool2d(2, stride=1)  # b, 8, 8, 8
+            nn.MaxPool2d(2, stride=1),  # b, 8, 8, 8
             nn.Conv2d(8, 4, 3, stride=1, padding=1),  # b, 4, 8, 8
             nn.ReLU(True),
-            nn.MaxPool2d(2, stride=1)  # b, 4, 4, 4
+            nn.MaxPool2d(2, stride=1),  # b, 4, 4, 4
         )
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(4, 16, 3, stride=2, padding=1),  # b, 16, 7, 7
@@ -31,7 +31,7 @@ class autoencoder(nn.Module):
             nn.ConvTranspose2d(16, 8, 3, stride=2, padding=0),  # b, 16, 15, 15
             nn.ReLU(True),
             nn.ConvTranspose2d(8, 3, 4, stride=2, padding=0),  # b, 8, 32, 32
-            nn.Tanh()
+            nn.Tanh(),
         )
 
     def forward(self, x):
