@@ -69,14 +69,12 @@ class PreActResNet(nn.Module):
         super(PreActResNet, self).__init__()
         self.in_planes = thickness
 
-        self.conv1 = nn.Conv2d(3, self.in_planes, kernel_size=3, stride=1, padding=1, bias=False)
-        self.layer1 = self._make_layer(block, self.in_planes, num_blocks[0], stride=1)
-        self.layer2 = self._make_layer(block, self.in_planes*2, num_blocks[1], stride=2)
-        self.layer3 = self._make_layer(block, self.in_planes*4, num_blocks[2], stride=2)
-        self.layer4 = self._make_layer(block, self.in_planes*8, num_blocks[3], stride=2)
-        print('in_planes: {}'.format(self.in_planes))
-        print('linear input dim: {}'.format(self.in_planes*8*block.expansion))
-        self.linear = nn.Linear(self.in_planes*8*block.expansion, num_classes)
+        self.conv1 = nn.Conv2d(3, thickness, kernel_size=3, stride=1, padding=1, bias=False)
+        self.layer1 = self._make_layer(block, thickness, num_blocks[0], stride=1)
+        self.layer2 = self._make_layer(block, thickness*2, num_blocks[1], stride=2)
+        self.layer3 = self._make_layer(block, thickness*4, num_blocks[2], stride=2)
+        self.layer4 = self._make_layer(block, thickness*8, num_blocks[3], stride=2)
+        self.linear = nn.Linear(thickness*8*block.expansion, num_classes)
 
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1]*(num_blocks-1)
