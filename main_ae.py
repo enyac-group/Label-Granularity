@@ -157,7 +157,7 @@ def train(epoch):
             logging.info('\n Epoch: [{0}][{1}/{2}]\t'
                         'Training Loss {train_loss:.3f} \t'
                         .format(epoch, batch_idx, len(trainloader),
-                        train_loss=train_loss/(batch_idx+1))
+                        train_loss=train_loss/(batch_idx+1)))
 
 # Training
 def get_feat(loader):
