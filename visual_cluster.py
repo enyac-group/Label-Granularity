@@ -6,7 +6,7 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
 results_dir = '/home/rzding/pytorch-cifar/results'
-SPLIT = 'train'
+SPLIT = 'test'
 DATASET_NAME = 'CIFAR100'
 if DATASET_NAME == 'CIFAR10':
 	if SPLIT == 'test':
@@ -91,21 +91,28 @@ def normalize_r(x):
 
 def sum_square_distance(x):
 	mean = np.mean(x, axis=0, keepdims=True)
+	#print mean.shape
 	distance_to_mean = np.linalg.norm(x-mean, ord=2, axis=1)
-	return np.sum(np.square(distance_to_mean)), np.squeeze(mean)
+	#print distance_to_mean.shape
+	sum_of_square = np.square(distance_to_mean).sum()
+	#print sum_of_square
+	return sum_of_square, np.squeeze(mean)
 
 def compute_class_variance(labels, features, exp_name=''):
 	intra_class_dist = 0
-	num_sample = len(list(labels))
+	num_sample = 0.
 	class_mean = []
 	num_class = max(labels)+1
-	for label in set(list(labels)):
+	for label in range(int(num_class)):
 		index = (labels == label)
+		num_sample += index.sum()
 		intra_class_dist_temp, mean_temp = sum_square_distance(features[index,:])
 #		print intra_class_dist_temp/(index.sum()-1)
 		intra_class_dist += intra_class_dist_temp
 		class_mean.append(mean_temp)
 	print exp_name, ' intra class variance=', intra_class_dist/(float(num_sample) - num_class)
+	print 'Number of samples:', num_sample
+	print 'Number of classes:', num_class
 
 	inter_class_dist,_ = sum_square_distance(np.array(class_mean))
 	print exp_name, ' inter class variance=', inter_class_dist/(num_class-1.)
@@ -153,7 +160,7 @@ num_fine_class = len(set(list(fine_label)))
 num_coarse_class = len(set(list(coarse_label)))
 
 total_size = fine_label.shape[0]
-sample_size = min(2000, total_size)
+sample_size = min(20000, total_size)
 shuffle_idx = np.random.permutation(total_size)[:sample_size]
 
 fine_fc7_rwn1_sample = normalize_r(fine_feat[shuffle_idx,:])
@@ -213,7 +220,7 @@ if plot_data:
 if plot_density:
 	print 'Plotting density...'
 	temp_label = fine_label[shuffle_idx]
-	for i in range(10):
+	for i in range(num_fine_class):
 		temp_idx = (temp_label == i)
 		plot_density(fine_fc7_rwn1_tsne_sample[temp_idx,0], fine_fc7_rwn1_tsne_sample[temp_idx,1], mean=[fine_fc7_rwn1_tsne_sample[-(num_fine_class+num_coarse_class)+i,0], fine_fc7_rwn1_tsne_sample[-(num_fine_class+num_coarse_class)+i,1]], filename=dataset+'_fine_fc7_rwn1_TSNE_sample-{0}_density_class{1}.jpg'.format(sample_size,i))
 	#print fine_fc7_rwn1_tsne_sample[-2:,0], fine_fc7_rwn1_tsne_sample[-2:,1]
@@ -221,7 +228,7 @@ if plot_density:
 	plot_density(fine_fc7_rwn1_tsne_sample[:-(num_fine_class+num_coarse_class),0], fine_fc7_rwn1_tsne_sample[:-(num_fine_class+num_coarse_class),1], mean=[fine_fc7_rwn1_tsne_sample[-(num_fine_class+num_coarse_class):-num_coarse_class,0], fine_fc7_rwn1_tsne_sample[-(num_fine_class+num_coarse_class):-num_coarse_class,1]], filename=dataset+'_fine_fc7_rwn1_TSNE_sample-{0}_density_allclass.jpg'.format(sample_size))
 	
 	temp_label = coarse_label[shuffle_idx]
-	for i in range(2):
+	for i in range(num_coarse_class):
 		temp_idx = (temp_label == i)
 		plot_density(fine_fc7_rwn1_tsne_sample[temp_idx,0], fine_fc7_rwn1_tsne_sample[temp_idx,1], mean=[fine_fc7_rwn1_tsne_sample[-num_coarse_class+i,0], fine_fc7_rwn1_tsne_sample[-num_coarse_class+i,1]], filename=dataset+'_f2c_fc7_rwn1_TSNE_sample-{0}_density_class{1}.jpg'.format(sample_size,i))
 
