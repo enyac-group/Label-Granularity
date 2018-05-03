@@ -30,6 +30,8 @@ parser.add_argument('--resume', '-r', action='store_true', help='resume from che
 parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
                     help='results dir')
 parser.add_argument('--resume_dir', default=None, help='resume dir')
+parser.add_argument('--superclass', default=None, help='one of the super class')
+parser.add_argument('--gpus', default='0', help='gpus used')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -76,10 +78,19 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 #classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 classes_f2c = {}
 for idx,a_class in enumerate(classes):
-    if a_class in ['bird', 'plane', 'car', 'ship', 'truck']:
+    if a_class in ['plane', 'car', 'ship', 'truck']:
         classes_f2c[idx] = 0
-    elif a_class in ['cat', 'deer', 'dog', 'frog', 'horse']:
+    elif a_class in ['bird', 'cat', 'deer', 'dog', 'frog', 'horse']:
         classes_f2c[idx] = 1
+
+# default is 01289
+# classes_f2c = {}
+# for i in range(len(classes)):
+#     if str(i) in args.superclass:
+#         classes_f2c[i] = 0
+#     else:
+#         classes_f2c[i] = 1
+# logging.info("classes_f2c: {}".format(classes_f2c))
 
 # Model
 if args.resume:
@@ -94,7 +105,7 @@ else:
     print('==> Building model..')
     # net = VGG('VGG19')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=2)
+    net = PreActResNet18(num_classes=10, thickness=16)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
@@ -110,16 +121,23 @@ logging.info("number of parameters: %d", num_parameters)
 
 if use_cuda:
     net.cuda()
-    net = torch.nn.DataParallel(net, device_ids=[0])
+    logging.info('gpus: {}'.format([int(ele) for ele in args.gpus]))
+    net = torch.nn.DataParallel(net, device_ids=[int(ele) for ele in args.gpus])
     cudnn.benchmark = True
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
+# regime = {
+#     0: {'optimizer': 'SGD', 'lr': 1e-1,
+#         'weight_decay': 5e-4, 'momentum': 0.9},
+#     150: {'lr': 1e-2},
+#     250: {'lr': 1e-3}
+# }
 regime = {
     0: {'optimizer': 'SGD', 'lr': 1e-1,
         'weight_decay': 5e-4, 'momentum': 0.9},
-    150: {'lr': 1e-2},
-    250: {'lr': 1e-3}
+    100: {'lr': 1e-2},
+    150: {'lr': 1e-3}
 }
 logging.info('training regime: %s', regime)
 
@@ -217,8 +235,8 @@ def test(epoch, f2c=False, train_f=True):
 
 
 for epoch in range(start_epoch, start_epoch+200):
-    train(epoch, f2c=True)
-    #test(epoch, f2c=False)
-    test(epoch, f2c=True, train_f=False)
+    train(epoch, f2c=False)
+    test(epoch, f2c=False)
+    test(epoch, f2c=True, train_f=True)
 
 # test(0, f2c=True, train_f=True)

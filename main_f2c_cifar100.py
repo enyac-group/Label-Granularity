@@ -22,8 +22,10 @@ from utils import progress_bar, adjust_optimizer, setup_logging
 from torch.autograd import Variable
 from datetime import datetime
 import logging
+import numpy as np
+import pickle
 
-NUM_CLASSES = 100
+NUM_CLASSES = 20
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR100 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -129,6 +131,18 @@ for idx,f_class in enumerate(fine_classes):
         print(idx)
         raise ValueError()
 
+# # Randomly re-define super classes
+# for i in range(50):
+#     idx = np.random.randint(0, 100)
+#     jdx = np.random.randint(0, 100)
+#     classes_f2c[idx], classes_f2c[jdx] = classes_f2c[jdx], classes_f2c[idx]
+# pickle.dump(classes_f2c, open(os.path.join(save_path, 'classes_f2c.pkl'), 'wb'))
+# logging.info('classes_f2c: {}'.format(classes_f2c))
+
+# load classes_f2c from pkl
+classes_f2c = pickle.load(open('results/2018-04-30_13-58-59/classes_f2c.pkl', 'rb'))
+logging.info('loading classes_f2c from: {}'.format('2018-04-30_13-58-59'))
+
 # Model
 if args.resume:
     # Load checkpoint.
@@ -190,7 +204,7 @@ def train(epoch, f2c=False):
             inputs, targets = inputs.cuda(), targets.cuda()
         optimizer.zero_grad()
         inputs, targets = Variable(inputs), Variable(targets)
-        outputs = net(inputs)
+        outputs, feat = net(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
@@ -224,7 +238,7 @@ def test(epoch, f2c=False, train_f=True):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
-        outputs = net(inputs)
+        outputs, feat = net(inputs)
         loss = criterion(outputs, targets)
 
         test_loss += loss.data[0]
@@ -266,9 +280,9 @@ def test(epoch, f2c=False, train_f=True):
 
 
 
-for epoch in range(start_epoch, start_epoch+200):
-    #train(epoch, f2c=False)
-    test(epoch, f2c=False)
-    #test(epoch, f2c=True, train_f=True)
+# for epoch in range(start_epoch, start_epoch+200):
+#     train(epoch, f2c=True)
+#     #test(epoch, f2c=False)
+#     test(epoch, f2c=True, train_f=False)
 
-# test(0, f2c=True, train_f=True)
+test(0, f2c=True, train_f=True)
