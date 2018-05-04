@@ -14,7 +14,7 @@ from torch.autograd import Variable
 class autoencoder(nn.Module):
     def __init__(self):
         super(autoencoder, self).__init__()
-        alpha = 1
+        alpha = 2
         self.encoder = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=16*alpha, kernel_size=3, stride=1, padding=1),  # b, 16, 32, 32
             nn.BatchNorm2d(16*alpha),

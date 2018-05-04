@@ -186,17 +186,20 @@ def test_accuracy_autoencoder(train_feat, test_feat, train_label, test_label):
 
 trainset_unshuffle = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_test)
 trainloader_unshuffle = torch.utils.data.DataLoader(trainset_unshuffle, batch_size=250, shuffle=False, num_workers=2)
+best_acc = 0.
 for epoch in range(start_epoch, start_epoch+90):
     train(epoch)
     feats, targets = get_feat(trainloader_unshuffle)
     feats_test, targets_test = get_feat(testloader)
-    pickle.dump(feats, open(os.path.join(save_path, 'ae_feats.pkl'), 'wb'))
     acc = test_accuracy_autoencoder(feats, feats_test, targets, targets_test)
     logging.info('\n Epoch: [{}]\t Accuracy: {} \t'
                         .format(epoch, acc))
+    if best_acc < acc:
+        best_acc = acc
+        pickle.dump(feats, open(os.path.join(save_path, 'ae_feats.pkl'), 'wb'))
 
 
 
 
-feats, targets = get_feat(trainloader_unshuffle)
-pickle.dump(feats, open(os.path.join(save_path, 'ae_feats.pkl')))
+# feats, targets = get_feat(trainloader_unshuffle)
+# pickle.dump(feats, open(os.path.join(save_path, 'ae_feats.pkl')))
