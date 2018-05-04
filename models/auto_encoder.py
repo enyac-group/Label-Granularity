@@ -41,7 +41,7 @@ class autoencoder(nn.Module):
         )
 
     def forward(self, x):
-        print('x variance: '.format(x.std()))
+        print('x max: {}, min: {}'.format(x.max(), x.min())
         feats = self.encoder(x)
         x = self.decoder(feats)
         feats = feats.view(feats.size(0), -1)
