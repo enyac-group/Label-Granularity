@@ -196,7 +196,8 @@ for epoch in range(start_epoch, start_epoch+90):
                         .format(epoch, acc))
     if best_acc < acc:
         best_acc = acc
-        pickle.dump(feats, open(os.path.join(save_path, 'ae_feats.pkl'), 'wb'))
+        pickle.dump({'feats': feats, 'targets': targets},
+             open(os.path.join(save_path, 'ae_feats.pkl'), 'wb'))
 
 
 
