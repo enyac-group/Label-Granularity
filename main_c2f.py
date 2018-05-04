@@ -174,7 +174,11 @@ pickle.dump(label_f, open(os.path.join(save_path, 'label_f.pkl'), 'wb'))
 
 # Step3: use the new label to train network
 # Training
-net_new = PreActResNet18(num_classes=NUM_CLASSES*NUM_CLUSTERS)
+net_new = PreActResNet18(num_classes=NUM_CLASSES*NUM_CLUSTERS, thickness=64)
+
+logging.info("new model structure: %s", net_new)
+num_parameters = sum([l.nelement() for l in net_new.parameters()])
+logging.info("number of parameters: %d", num_parameters)
 if use_cuda:
     net_new.cuda()
     net_new = torch.nn.DataParallel(net_new, device_ids=[0])
