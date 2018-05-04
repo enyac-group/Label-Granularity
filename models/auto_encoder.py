@@ -16,25 +16,32 @@ class autoencoder(nn.Module):
         super(autoencoder, self).__init__()
         self.encoder = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, stride=1, padding=1),  # b, 16, 32, 32
+            nn.BatchNorm2d(16),
             nn.ReLU(True),
             nn.MaxPool2d(2, stride=2),  # b, 16, 16, 16
             nn.Conv2d(16, 8, 3, stride=1, padding=1),  # b, 8, 16, 16
+            nn.BatchNorm2d(8),
             nn.ReLU(True),
             nn.MaxPool2d(2, stride=2),  # b, 8, 8, 8
             nn.Conv2d(8, 4, 3, stride=1, padding=1),  # b, 4, 8, 8
+            nn.BatchNorm2d(4),
             nn.ReLU(True),
             nn.MaxPool2d(2, stride=2),  # b, 4, 4, 4
         )
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(4, 16, 3, stride=2, padding=1),  # b, 16, 7, 7
+            nn.BatchNorm2d(16),
             nn.ReLU(True),
             nn.ConvTranspose2d(16, 8, 3, stride=2, padding=0),  # b, 16, 15, 15
+            nn.BatchNorm2d(8),
             nn.ReLU(True),
             nn.ConvTranspose2d(8, 3, 4, stride=2, padding=0),  # b, 8, 32, 32
+            nn.BatchNorm2d(3),
             nn.Tanh(),
         )
 
     def forward(self, x):
+        print('x variance: '.format(x.std()))
         feats = self.encoder(x)
         x = self.decoder(feats)
         feats = feats.view(feats.size(0), -1)
