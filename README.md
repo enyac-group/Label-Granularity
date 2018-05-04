@@ -33,6 +33,10 @@ CUDA_VISIBLE_DEVICES=1 python main_genfeat.py
 # and train c2f using it 
 python main_c2f.py --resume_dir results/2018-05-04_17-59-01
 
+# Get feature by first training VGG8
+CUDA_VISIBLE_DEVICES=1 python main_f2c.py
+
+
 
 # Train CIFAR10 with PyTorch
 
