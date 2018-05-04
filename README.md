@@ -28,6 +28,8 @@ python main_c2f_cifar100.py --resume --resume_dir results/2018-04-25_19-48-32
 # Train c2f using AE features
 python main_c2f.py --resume_dir results/2018-05-03_22-57-40
 
+# Get feature from pretrained resnet-50
+CUDA_VISIBLE_DEVICES=1 python main_genfeat.py 
 
 
 # Train CIFAR10 with PyTorch

@@ -27,13 +27,12 @@ import numpy as np
 import pickle
 
 
-parser = argparse.ArgumentParser(description='Auto-encoder on CIFAR-10')
+parser = argparse.ArgumentParser(description='Gen feat from net pre-trained on ImageNet')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
                     help='results dir')
 parser.add_argument('--resume_dir', default=None, help='resume dir')
-parser.add_argument('--superclass', default=None, help='one of the super class')
 parser.add_argument('--gpus', default='0', help='gpus used')
 args = parser.parse_args()
 
