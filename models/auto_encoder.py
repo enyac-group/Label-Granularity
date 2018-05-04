@@ -37,11 +37,11 @@ class autoencoder(nn.Module):
             nn.ReLU(True),
             nn.ConvTranspose2d(8, 3, 4, stride=2, padding=0),  # b, 8, 32, 32
             nn.BatchNorm2d(3),
-            nn.Tanh(),
+            #nn.Tanh(),
         )
 
     def forward(self, x):
-        print('x max: {}, min: {}'.format(x.max(), x.min()))
+        #print('x max: {}, min: {}'.format(x.max(), x.min()))
         feats = self.encoder(x)
         x = self.decoder(feats)
         feats = feats.view(feats.size(0), -1)
