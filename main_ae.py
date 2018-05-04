@@ -177,7 +177,7 @@ def get_feat(loader):
 
 def test_accuracy_autoencoder(train_feat, test_feat, train_label, test_label):
 	Dist = sklearn.metrics.pairwise.pairwise_distances(train_feat, test_feat)
-	nearest_n = np.argmax(Dist, aixs = 0)
+	nearest_n = np.argmax(Dist, axis=0)
 	pred_label = train_label[nearest_n]
 	return np.sum(pred_label == test_label)/test_feat.shape[0]
 
