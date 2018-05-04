@@ -103,9 +103,9 @@ if args.resume:
     start_epoch = checkpoint['epoch']
 else:
     print('==> Building model..')
-    # net = VGG('VGG19')
+    net = VGG('VGG8')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=10, thickness=64)
+    # net = PreActResNet18(num_classes=10, thickness=64, blocks=[2,2,2,2])
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
