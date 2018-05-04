@@ -129,10 +129,12 @@ optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5
 #     250: {'lr': 1e-3}
 # }
 regime = {
-    0: {'optimizer': 'SGD', 'lr': 1e-1,
-        'weight_decay': 5e-4, 'momentum': 0.9},
-    100: {'lr': 1e-2},
-    150: {'lr': 1e-3}
+    # 0: {'optimizer': 'SGD', 'lr': 1e-1,
+    #     'weight_decay': 5e-4, 'momentum': 0.9},
+    0: {'optimizer': 'Adam', 'betas': (0.9, 0.999),'lr': 1e-1,
+        'weight_decay': 5e-4},
+    30: {'lr': 1e-2},
+    60: {'lr': 1e-3}
 }
 logging.info('training regime: %s', regime)
 
