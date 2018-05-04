@@ -177,11 +177,12 @@ def get_feat(loader):
 
 def test_accuracy_autoencoder(train_feat, test_feat, train_label, test_label):
 	Dist = sklearn.metrics.pairwise.pairwise_distances(train_feat, test_feat)
-	nearest_n = np.argmax(Dist, axis=0)
+	nearest_n = np.argmin(Dist, axis=0)
 	pred_label = train_label[nearest_n]
 	return np.sum(pred_label == test_label)/float(test_feat.shape[0])
 
-trainloader_unshuffle = torch.utils.data.DataLoader(trainset, batch_size=250, shuffle=False, num_workers=2)
+trainset_unshuffle = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_test)
+trainloader_unshuffle = torch.utils.data.DataLoader(trainset_unshuffle, batch_size=250, shuffle=False, num_workers=2)
 for epoch in range(start_epoch, start_epoch+200):
     train(epoch)
     feats, targets = get_feat(trainloader_unshuffle)
