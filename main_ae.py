@@ -24,6 +24,7 @@ from datetime import datetime
 import logging
 import sklearn.metrics.pairwise
 import numpy as np
+import pickle
 
 
 parser = argparse.ArgumentParser(description='Auto-encoder on CIFAR-10')
