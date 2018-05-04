@@ -12,4 +12,5 @@ from .preact_resnet import *
 from .mobilenet import *
 from .mobilenetv2 import *
 from .wide_resnet import *
-from .auto_encoder import resnet18_imagenet, resnet34_imagenet, resnet50_imagenet, resnet101_imagenet, resnet152_imagenet
+from .auto_encoder import * 
+from .resnet_imagenet import resnet18_imagenet, resnet34_imagenet, resnet50_imagenet, resnet101_imagenet, resnet152_imagenet
