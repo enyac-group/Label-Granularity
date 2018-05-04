@@ -30,6 +30,8 @@ python main_c2f.py --resume_dir results/2018-05-03_22-57-40
 
 # Get feature from pretrained resnet-50
 CUDA_VISIBLE_DEVICES=1 python main_genfeat.py 
+# and train c2f using it 
+python main_c2f.py --resume_dir results/2018-05-04_17-59-01
 
 
 # Train CIFAR10 with PyTorch

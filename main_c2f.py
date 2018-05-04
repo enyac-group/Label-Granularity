@@ -136,7 +136,7 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False,
 # #pickle.dump([train_idx, all_targets], open(os.path.join(save_path, 'debug.pkl'), 'wb'))
 # pickle.dump([None, all_targets], open(os.path.join(save_path, 'debug.pkl'), 'wb'))
 
-dt = pickle.load(open(os.path.join(args.resume_dir, 'ae_feats.pkl'), 'rb'))
+dt = pickle.load(open(os.path.join(args.resume_dir, 'resnet50_feats.pkl'), 'rb'))
 train_feats = dt['feats']
 all_targets = dt['targets']
 
