@@ -23,7 +23,7 @@ class VGG(nn.Module):
         out = self.features(x)
         out = out.view(out.size(0), -1)
         out = self.classifier(out)
-        return out
+        return out, out
 
     def _make_layers(self, cfg):
         layers = []
