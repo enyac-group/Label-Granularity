@@ -187,6 +187,7 @@ for epoch in range(start_epoch, start_epoch+200):
     train(epoch)
     feats, targets = get_feat(trainloader_unshuffle)
     feats_test, targets_test = get_feat(testloader)
+    pickle.dump(feats, open(os.path.join(save_path, 'ae_feats.pkl')))
     acc = test_accuracy_autoencoder(feats, feats_test, targets, targets_test)
     logging.info('\n Epoch: [{}]\t Accuracy: {} \t'
                         .format(epoch, acc))
