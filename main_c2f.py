@@ -72,74 +72,74 @@ testset = dataset.data_cifar10_red.CIFAR10_RED(root='/home/rzding/DATA', train=F
 #testset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False, num_workers=2)
 
-# Model
-if args.resume:
-    # Load checkpoint.
-    print('==> Resuming from checkpoint..')
-    assert os.path.isdir(args.resume_dir)
-    checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
-    net = checkpoint['net']
-    #best_acc = checkpoint['acc']
-    start_epoch = checkpoint['epoch']
-else:
-    print('==> Building model..')
-    # net = VGG('VGG19')
-    # net = ResNet18()
-    net = PreActResNet18(num_classes=10)
-    # net = GoogLeNet()
-    # net = DenseNet121()
-    # net = ResNeXt29_2x64d()
-    # net = MobileNet()
-    # net = MobileNetV2()
-    # net = DPN92()
-    # net = ShuffleNetG2()
-    # net = SENet18()
+# # Model
+# if args.resume:
+#     # Load checkpoint.
+#     print('==> Resuming from checkpoint..')
+#     assert os.path.isdir(args.resume_dir)
+#     checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
+#     net = checkpoint['net']
+#     #best_acc = checkpoint['acc']
+#     start_epoch = checkpoint['epoch']
+# else:
+#     print('==> Building model..')
+#     # net = VGG('VGG19')
+#     # net = ResNet18()
+#     net = PreActResNet18(num_classes=10)
+#     # net = GoogLeNet()
+#     # net = DenseNet121()
+#     # net = ResNeXt29_2x64d()
+#     # net = MobileNet()
+#     # net = MobileNetV2()
+#     # net = DPN92()
+#     # net = ShuffleNetG2()
+#     # net = SENet18()
 
-logging.info("model structure: %s", net)
-num_parameters = sum([l.nelement() for l in net.parameters()])
-logging.info("number of parameters: %d", num_parameters)
+# logging.info("model structure: %s", net)
+# num_parameters = sum([l.nelement() for l in net.parameters()])
+# logging.info("number of parameters: %d", num_parameters)
 
-if use_cuda:
-    net.cuda()
-    net = torch.nn.DataParallel(net, device_ids=[0])
-    cudnn.benchmark = True
+# if use_cuda:
+#     net.cuda()
+#     net = torch.nn.DataParallel(net, device_ids=[0])
+#     cudnn.benchmark = True
 
 
 
-# Step1: start from a pre-trained model, load it and save the output of last layer
-# result format: a matrix where each row is a datapoint, a vector as class of each datapoint
-def get_feat(net, trainloader):
-    net.eval()
-    all_feats = []
-    all_idx = []
-    all_targets = []
-    for batch_idx, (inputs, input_idx, targets) in enumerate(trainloader):
-        all_idx.append(input_idx.numpy())
-        all_targets.append(targets.numpy())
-        if use_cuda:
-            inputs, targets = inputs.cuda(), targets.cuda()
-        inputs, targets = Variable(inputs, volatile=True), Variable(targets)
-        outputs, feats = net(inputs)
-        all_feats.append(feats.data.cpu().numpy())
-    all_feats = np.vstack(all_feats)
-    all_idx = np.hstack(all_idx)
-    all_targets = np.hstack(all_targets)
-    return all_feats, all_idx, all_targets
+# # Step1: start from a pre-trained model, load it and save the output of last layer
+# # result format: a matrix where each row is a datapoint, a vector as class of each datapoint
+# def get_feat(net, trainloader):
+#     net.eval()
+#     all_feats = []
+#     all_idx = []
+#     all_targets = []
+#     for batch_idx, (inputs, input_idx, targets) in enumerate(trainloader):
+#         all_idx.append(input_idx.numpy())
+#         all_targets.append(targets.numpy())
+#         if use_cuda:
+#             inputs, targets = inputs.cuda(), targets.cuda()
+#         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
+#         outputs, feats = net(inputs)
+#         all_feats.append(feats.data.cpu().numpy())
+#     all_feats = np.vstack(all_feats)
+#     all_idx = np.hstack(all_idx)
+#     all_targets = np.hstack(all_targets)
+#     return all_feats, all_idx, all_targets
 
-trainset_unshuffle = dataset.data_cifar10_red.CIFAR10_RED(root='/home/rzding/DATA', train=True, download=True, transform=transform_test)
-trainloader_unshuffle = torch.utils.data.DataLoader(trainset_unshuffle, batch_size=250, shuffle=False, num_workers=2)
+# trainset_unshuffle = dataset.data_cifar10_red.CIFAR10_RED(root='/home/rzding/DATA', train=True, download=True, transform=transform_test)
+# trainloader_unshuffle = torch.utils.data.DataLoader(trainset_unshuffle, batch_size=250, shuffle=False, num_workers=2)
 
-train_feats, train_idx, all_targets = get_feat(net, trainloader_unshuffle)
-pickle.dump(train_feats, open(os.path.join(save_path, 'train_feats.pkl'), 'wb'))
-print('all feats size: {}'.format(train_feats.shape))
-print('feats sum: {}'.format(train_feats.sum(axis=1)))
-print('feats first row: {}'.format(train_feats[0]))
-#pickle.dump([train_idx, all_targets], open(os.path.join(save_path, 'debug.pkl'), 'wb'))
-pickle.dump([None, all_targets], open(os.path.join(save_path, 'debug.pkl'), 'wb'))
+# train_feats, train_idx, all_targets = get_feat(net, trainloader_unshuffle)
+# pickle.dump(train_feats, open(os.path.join(save_path, 'train_feats.pkl'), 'wb'))
+# print('all feats size: {}'.format(train_feats.shape))
+# print('feats sum: {}'.format(train_feats.sum(axis=1)))
+# print('feats first row: {}'.format(train_feats[0]))
+# #pickle.dump([train_idx, all_targets], open(os.path.join(save_path, 'debug.pkl'), 'wb'))
+# pickle.dump([None, all_targets], open(os.path.join(save_path, 'debug.pkl'), 'wb'))
 
-# dt = pickle.load(open(os.path.join(args.resume_dir, 'resnet50_feats.pkl'), 'rb'))
-# train_feats = dt['feats']
-# all_targets = dt['targets']
+dt = pickle.load(open(os.path.join(args.resume_dir, 'ae_feats.pkl'), 'rb'))
+train_feats = dt['feats']
+all_targets = dt['targets']
 
 # Step2: cluster the data points per class
 import sklearn.cluster as cls
