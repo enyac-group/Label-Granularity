@@ -160,7 +160,7 @@ label_f = np.zeros(len(all_targets))
 for a_class in range(NUM_CLASSES):
     idx = (all_targets == a_class)
     #label_cur = clustering(train_feats[idx] / train_feats[idx].max(), num_clusters=NUM_CLUSTERS)
-    label_cur = clustering(normalize_c(train_feats[idx]), num_clusters=NUM_CLUSTERS)
+    label_cur = clustering(normalize_r(train_feats[idx]), num_clusters=NUM_CLUSTERS)
     for i in range(NUM_CLUSTERS):
         logging.info('class {} has {} data'.format(
                 NUM_CLUSTERS * a_class + i, (label_cur == i).sum() ))
@@ -213,7 +213,7 @@ def train(epoch, net_new, trainloader, optimizer, fine=False):
     optimizer = adjust_optimizer(optimizer, epoch, regime)
     for batch_idx, (inputs, input_idx, targets) in enumerate(trainloader):
         if fine:
-            targets_c = targets.copy()
+            targets_c = targets
             for idx,target in enumerate(targets):
                 #print(targets[idx], int(label_f[input_idx[idx]]))
                 targets[idx] = int(label_f[input_idx[idx]])
@@ -225,9 +225,7 @@ def train(epoch, net_new, trainloader, optimizer, fine=False):
         #print(outputs.data.cpu().numpy())
         #loss = criterion(outputs, targets)
         loss1 = criterion(outputs, targets) 
-        loss2 = F.binary_cross_entropy_with_logits(
-            (outputs[:,0:20:2]+outputs[:,1:20:2])/2., targets_c, 
-            weight=None, size_average=True, reduce=True)
+        loss2 = criterion((outputs[:,0:20:2]+outputs[:,1:20:2])/2., targets_c)
         loss = loss1 + loss2
         loss.backward()
         optimizer.step()
