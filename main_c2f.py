@@ -213,7 +213,7 @@ def train(epoch, net_new, trainloader, optimizer, fine=False):
     optimizer = adjust_optimizer(optimizer, epoch, regime)
     for batch_idx, (inputs, input_idx, targets) in enumerate(trainloader):
         if fine:
-            targets_c = targets
+            targets_c = Variable(targets.cuda())
             for idx,target in enumerate(targets):
                 #print(targets[idx], int(label_f[input_idx[idx]]))
                 targets[idx] = int(label_f[input_idx[idx]])
