@@ -159,7 +159,7 @@ label_f = np.zeros(len(all_targets))
 for a_class in range(NUM_CLASSES):
     idx = (all_targets == a_class)
     #label_cur = clustering(train_feats[idx] / train_feats[idx].max(), num_clusters=NUM_CLUSTERS)
-    label_cur = clustering(normalize_r(train_feats[idx]), num_clusters=NUM_CLUSTERS)
+    label_cur = clustering(normalize_c(train_feats[idx]), num_clusters=NUM_CLUSTERS)
     for i in range(NUM_CLUSTERS):
         logging.info('class {} has {} data'.format(
                 NUM_CLUSTERS * a_class + i, (label_cur == i).sum() ))
