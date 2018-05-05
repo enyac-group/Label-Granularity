@@ -206,11 +206,14 @@ def train(epoch, net_new, trainloader, optimizer, fine=False):
     print('\nEpoch: %d' % epoch)
     net_new.train()
     train_loss = 0
+    train_loss1 = 0
+    train_loss2 = 0
     correct = 0
     total = 0
     optimizer = adjust_optimizer(optimizer, epoch, regime)
     for batch_idx, (inputs, input_idx, targets) in enumerate(trainloader):
         if fine:
+            targets_c = targets.copy()
             for idx,target in enumerate(targets):
                 #print(targets[idx], int(label_f[input_idx[idx]]))
                 targets[idx] = int(label_f[input_idx[idx]])
@@ -220,11 +223,18 @@ def train(epoch, net_new, trainloader, optimizer, fine=False):
         inputs, targets = Variable(inputs), Variable(targets)
         outputs, feats = net_new(inputs)
         #print(outputs.data.cpu().numpy())
-        loss = criterion(outputs, targets)
+        #loss = criterion(outputs, targets)
+        loss1 = criterion(outputs, targets) 
+        loss2 = F.binary_cross_entropy_with_logits(
+            (outputs[:,0:20:2]+outputs[:,1:20:2])/2., targets_c, 
+            weight=None, size_average=True, reduce=True)
+        loss = loss1 + loss2
         loss.backward()
         optimizer.step()
 
         train_loss += loss.data[0]
+        train_loss1 += loss1.data[0]
+        train_loss2 += loss2.data[0]
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
         correct += predicted.eq(targets.data).cpu().sum()
@@ -236,9 +246,13 @@ def train(epoch, net_new, trainloader, optimizer, fine=False):
         if batch_idx % 20 == 0:
             logging.info('\n Epoch: [{0}][{1}/{2}]\t'
                         'Training Loss {train_loss:.3f} \t'
+                        'Training Loss1 {train_loss1:.3f} \t'
+                        'Training Loss2 {train_loss2:.3f} \t'
                         'Training Prec@1 {train_prec1:.3f} \t'
                         .format(epoch, batch_idx, len(trainloader),
                         train_loss=train_loss/(batch_idx+1), 
+                        train_loss1=train_loss1/(batch_idx+1),
+                        train_loss2=train_loss2/(batch_idx+1),
                         train_prec1=100.*correct/total))
 
 
