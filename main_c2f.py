@@ -226,7 +226,7 @@ def train(epoch, net_new, trainloader, optimizer, fine=False):
         #loss = criterion(outputs, targets)
         loss1 = criterion(outputs, targets) 
         loss2 = criterion((outputs[:,0:20:2]+outputs[:,1:20:2])/2., targets_c)
-        loss = loss1 + loss2
+        loss = loss1 * 0.3 + loss2
         loss.backward()
         optimizer.step()
 
