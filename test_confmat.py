@@ -22,6 +22,7 @@ from utils import progress_bar, adjust_optimizer, setup_logging
 from torch.autograd import Variable
 from datetime import datetime
 import logging
+import pickle
 
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
