@@ -25,6 +25,7 @@ import logging
 import pickle
 import numpy as np
 import seaborn as sns
+import pandas as pd
 
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
@@ -53,6 +54,7 @@ if args.resume:
 conf_matrix_nrm = conf_matrix / conf_matrix.sum(axis=0)
 conf_matrix_nrm = (conf_matrix_nrm + np.transpose(conf_matrix_nrm)) / 2.
 print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
-ax = sns.heatmap(conf_matrix_nrm, vmin=0, vmax=0.1)
-fig = ax.get_figure()
-fig.savefig(os.path.join(save_path, 'conf_matrix.png'))
+plt.imshow(conf_matrix_nrm, cmap='hot', interpolation='nearest')
+plt.set_xticklabels(['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck'])
+
+plt.savefig(os.path.join(save_path, 'conf_matrix.png'))

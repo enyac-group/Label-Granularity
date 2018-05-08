@@ -40,7 +40,8 @@ CUDA_VISIBLE_DEVICES=1 python main_c2f.py --resume --resume_dir results/2018-05-
 
 # Get confusion matrix for CIFAR-10
 CUDA_VISIBLE_DEVICES=1 python test_confmat.py --resume --resume_dir results/2018-05-04_11-25-10
-
+# and plot conf matrix
+python plots.py --resume --resume_dir results/2018-05-07_23-48-19
 
 # Train CIFAR10 with PyTorch
 
