@@ -121,6 +121,7 @@ if args.resume:
     checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
     net_dict = net.state_dict()
     net_dict.update(checkpoint['net'].state_dict())
+    net_dict = {key: val for key,val in net_dict.items() if 'linear' not in key}
     net.load_state_dict(net_dict, strict=False)
 
 
