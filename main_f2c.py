@@ -68,7 +68,8 @@ transform_test = transforms.Compose([
     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
 ])
 
-trainset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
+#trainset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
+trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
 
 testset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
@@ -83,46 +84,46 @@ for idx,a_class in enumerate(classes):
     elif a_class in ['bird', 'cat', 'deer', 'dog', 'frog', 'horse']:
         classes_f2c[idx] = 1
 
-# default is 01289
-# classes_f2c = {}
-# for i in range(len(classes)):
-#     if str(i) in args.superclass:
-#         classes_f2c[i] = 0
-#     else:
-#         classes_f2c[i] = 1
-# logging.info("classes_f2c: {}".format(classes_f2c))
+#default is 01289
+classes_f2c = {}
+for i in range(len(classes)):
+    if str(i) in args.superclass:
+        classes_f2c[i] = 0
+    else:
+        classes_f2c[i] = 1
+logging.info("classes_f2c: {}".format(classes_f2c))
 
-# # Model
-# if args.resume:
-#     # Load checkpoint.
-#     print('==> Resuming from checkpoint..')
-#     assert os.path.isdir(args.resume_dir)
-#     checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
-#     net = checkpoint['net']
-#     best_acc = checkpoint['acc']
-#     start_epoch = checkpoint['epoch']
-# else:
-#     print('==> Building model..')
-#     # net = VGG('VGG8')
-#     # net = ResNet18()
-#     # net = PreActResNet18(num_classes=10, thickness=64, blocks=[2,2,2,2])
-#     # net = GoogLeNet()
-#     # net = DenseNet121()
-#     # net = ResNeXt29_2x64d()
-#     # net = MobileNet()
-#     # net = MobileNetV2()
-#     # net = DPN92()
-#     # net = ShuffleNetG2()
-#     # net = SENet18()
-
-net = PreActResNet18(num_classes=2, thickness=64, blocks=[2,2,2,2])
+# Model
 if args.resume:
+    # Load checkpoint.
+    print('==> Resuming from checkpoint..')
     assert os.path.isdir(args.resume_dir)
     checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
-    net_dict = net.state_dict()
-    net_dict.update(checkpoint['net'].state_dict())
-    net_dict = {key: val for key,val in net_dict.items() if 'linear' not in key}
-    net.load_state_dict(net_dict, strict=False)
+    net = checkpoint['net']
+    best_acc = checkpoint['acc']
+    start_epoch = checkpoint['epoch']
+else:
+    print('==> Building model..')
+    # net = VGG('VGG8')
+    # net = ResNet18()
+    net = PreActResNet18(num_classes=10, thickness=64, blocks=[2,2,2,2])
+    # net = GoogLeNet()
+    # net = DenseNet121()
+    # net = ResNeXt29_2x64d()
+    # net = MobileNet()
+    # net = MobileNetV2()
+    # net = DPN92()
+    # net = ShuffleNetG2()
+    # net = SENet18()
+
+# net = PreActResNet18(num_classes=2, thickness=64, blocks=[2,2,2,2])
+# if args.resume:
+#     assert os.path.isdir(args.resume_dir)
+#     checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
+#     net_dict = net.state_dict()
+#     net_dict.update(checkpoint['net'].state_dict())
+#     net_dict = {key: val for key,val in net_dict.items() if 'linear' not in key}
+#     net.load_state_dict(net_dict, strict=False)
 
 
 logging.info("model structure: %s", net)
@@ -143,16 +144,16 @@ optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5
 #     150: {'lr': 1e-2},
 #     250: {'lr': 1e-3}
 # }
-# regime = {
-#     0: {'optimizer': 'SGD', 'lr': 1e-1,
-#         'weight_decay': 5e-4, 'momentum': 0.9},
-#     150: {'lr': 1e-2},
-#     250: {'lr': 1e-3},
-# }
 regime = {
-    0: {'optimizer': 'SGD', 'lr': 1e-4, 'momentum': 0.9},
-    50: {'lr': 1e-5},
+    0: {'optimizer': 'SGD', 'lr': 1e-1,
+        'weight_decay': 5e-4, 'momentum': 0.9},
+    150: {'lr': 1e-2},
+    250: {'lr': 1e-3},
 }
+# regime = {
+#     0: {'optimizer': 'SGD', 'lr': 1e-4, 'momentum': 0.9},
+#     50: {'lr': 1e-5},
+# }
 logging.info('training regime: %s', regime)
 
 # Training
@@ -248,9 +249,9 @@ def test(epoch, f2c=False, train_f=True):
 
 
 start_epoch = 0
-for epoch in range(start_epoch, start_epoch+100):
-    train(epoch, f2c=True)
-    #test(epoch, f2c=False)
-    test(epoch, f2c=True, train_f=False)
+for epoch in range(start_epoch, start_epoch+200):
+    train(epoch, f2c=False)
+    test(epoch, f2c=False)
+    test(epoch, f2c=True, train_f=True)
 
 # test(0, f2c=True, train_f=True)

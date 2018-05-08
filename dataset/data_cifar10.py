@@ -84,6 +84,15 @@ class CIFAR10(data.Dataset):
             self.train_data = np.concatenate(self.train_data)
             self.train_data = self.train_data.reshape((50000, 3, 32, 32))
             self.train_data = self.train_data.transpose((0, 2, 3, 1))  # convert to HWC
+            # !!!!! reduce by half !!!!!
+            self.train_labels = np.array(self.train_labels)
+            idx_left = np.ones(50000, dtype=bool)
+            for i in range(10):
+                idx = np.where(self.train_labels == i)[0]
+                print('class i has {} number of data'.format(idx.shape[0]))
+                idx_left[idx[0:2500]] = True
+            self.train_data = self.train_data[idx_left]
+            self.train_labels = self.train_labels[idx_left]
         else:
             f = self.test_list[0][0]
             file = os.path.join(root, self.base_folder, f)
@@ -129,7 +138,8 @@ class CIFAR10(data.Dataset):
 
     def __len__(self):
         if self.train:
-            return 50000
+            #return 50000
+            return 25000
         else:
             return 10000
 

@@ -48,23 +48,27 @@ logging.info("saving to %s", save_path)
 logging.info("run arguments: %s", args)
 
 
-# Plot confusion matrix
+# # Plot confusion matrix
+# if args.resume:
+#     conf_matrix = pickle.load(open(os.path.join(args.resume_dir, 'conf_matrix.pkl'), 'rb'))
+
+# conf_matrix_nrm = conf_matrix / conf_matrix.sum(axis=0)
+# conf_matrix_nrm = (conf_matrix_nrm + np.transpose(conf_matrix_nrm)) / 2.
+# print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
+# # plt.imshow(conf_matrix_nrm, cmap='hot', interpolation='nearest')
+# # plt.set_xticklabels(['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck'])
+# # plt.savefig(os.path.join(save_path, 'conf_matrix.png'))
+
+# classes = ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+# df = pd.DataFrame(conf_matrix_nrm, columns=classes)
+# df['classes'] = classes
+# df = df.set_index('classes')
+# print(df)
+# f, ax = plt.subplots(figsize=(12, 10))
+# sns.heatmap(df, vmin=0, vmax=0.1, annot=True, ax=ax)
+# fig = ax.get_figure()
+# fig.savefig(os.path.join(save_path, 'conf_matrix.png'))
+
+# Plot accuracy-metric_by_confmat curve
 if args.resume:
     conf_matrix = pickle.load(open(os.path.join(args.resume_dir, 'conf_matrix.pkl'), 'rb'))
-
-conf_matrix_nrm = conf_matrix / conf_matrix.sum(axis=0)
-conf_matrix_nrm = (conf_matrix_nrm + np.transpose(conf_matrix_nrm)) / 2.
-print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
-# plt.imshow(conf_matrix_nrm, cmap='hot', interpolation='nearest')
-# plt.set_xticklabels(['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck'])
-# plt.savefig(os.path.join(save_path, 'conf_matrix.png'))
-
-classes = ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
-df = pd.DataFrame(conf_matrix_nrm, columns=classes)
-df['classes'] = classes
-df = df.set_index('classes')
-print(df)
-f, ax = plt.subplots(figsize=(12, 10))
-sns.heatmap(df, vmin=0, vmax=0.1, annot=True, ax=ax)
-fig = ax.get_figure()
-fig.savefig(os.path.join(save_path, 'conf_matrix.png'))
