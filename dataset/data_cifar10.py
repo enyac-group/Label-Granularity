@@ -133,7 +133,7 @@ class CIFAR10(data.Dataset):
         if self.target_transform is not None:
             target = self.target_transform(target)
 
-        return img, index, target
+        return img, target #img, index, target
 
 
     def __len__(self):
