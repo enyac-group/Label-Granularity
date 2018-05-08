@@ -56,7 +56,7 @@ if args.resume:
 conf_matrix_nrm = conf_matrix / conf_matrix.sum(axis=0)
 conf_matrix_nrm = (conf_matrix_nrm + np.transpose(conf_matrix_nrm)) / 2.
 print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
-plt.imshow(conf_matrix_nrm, cmap='hot', interpolation='nearest')
-plt.set_xticklabels(['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck'])
+ax = plt.imshow(conf_matrix_nrm, cmap='hot', interpolation='nearest')
+ax.set_xticklabels(['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck'])
 
 plt.savefig(os.path.join(save_path, 'conf_matrix.png'))
