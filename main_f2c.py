@@ -92,28 +92,37 @@ for idx,a_class in enumerate(classes):
 #         classes_f2c[i] = 1
 # logging.info("classes_f2c: {}".format(classes_f2c))
 
-# Model
+# # Model
+# if args.resume:
+#     # Load checkpoint.
+#     print('==> Resuming from checkpoint..')
+#     assert os.path.isdir(args.resume_dir)
+#     checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
+#     net = checkpoint['net']
+#     best_acc = checkpoint['acc']
+#     start_epoch = checkpoint['epoch']
+# else:
+#     print('==> Building model..')
+#     # net = VGG('VGG8')
+#     # net = ResNet18()
+#     # net = PreActResNet18(num_classes=10, thickness=64, blocks=[2,2,2,2])
+#     # net = GoogLeNet()
+#     # net = DenseNet121()
+#     # net = ResNeXt29_2x64d()
+#     # net = MobileNet()
+#     # net = MobileNetV2()
+#     # net = DPN92()
+#     # net = ShuffleNetG2()
+#     # net = SENet18()
+
+net = PreActResNet18(num_classes=10, thickness=64, blocks=[2,2,2,2])
 if args.resume:
-    # Load checkpoint.
-    print('==> Resuming from checkpoint..')
     assert os.path.isdir(args.resume_dir)
     checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
-    net = checkpoint['net']
-    best_acc = checkpoint['acc']
-    start_epoch = checkpoint['epoch']
-else:
-    print('==> Building model..')
-    net = VGG('VGG8')
-    # net = ResNet18()
-    # net = PreActResNet18(num_classes=10, thickness=64, blocks=[2,2,2,2])
-    # net = GoogLeNet()
-    # net = DenseNet121()
-    # net = ResNeXt29_2x64d()
-    # net = MobileNet()
-    # net = MobileNetV2()
-    # net = DPN92()
-    # net = ShuffleNetG2()
-    # net = SENet18()
+    net_dict = net.state_dict()
+    net_dict.update(checkpoint['net'].state_dict())
+    net.load_state_dict(net_dict)
+
 
 logging.info("model structure: %s", net)
 num_parameters = sum([l.nelement() for l in net.parameters()])
