@@ -60,7 +60,7 @@ print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
 # plt.savefig(os.path.join(save_path, 'conf_matrix.png'))
 
 df = pd.DataFrame(conf_matrix_nrm, columns=['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck'])
-df.set_index(['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck'])
+df = df.set_index(['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck'])
 f, ax = plt.subplots(figsize=(12, 10))
 sns.heatmap(df, vmin=0, vmax=0.1, annot=True, ax=ax)
 fig = ax.get_figure()
