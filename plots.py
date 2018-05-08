@@ -59,7 +59,6 @@ print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
 # plt.set_xticklabels(['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck'])
 # plt.savefig(os.path.join(save_path, 'conf_matrix.png'))
 
-f, ax = plt.subplots(figsize=(9, 6))
-sns.heatmap(conf_matrix_nrm, vmin=0, vmax=0.1, annot=True, ax=ax)
+ax = sns.heatmap(conf_matrix_nrm, vmin=0, vmax=0.1, annot=True)
 fig = ax.get_figure()
 fig.savefig(os.path.join(save_path, 'conf_matrix.png'))
