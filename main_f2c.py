@@ -115,7 +115,7 @@ for idx,a_class in enumerate(classes):
 #     # net = ShuffleNetG2()
 #     # net = SENet18()
 
-net = PreActResNet18(num_classes=10, thickness=64, blocks=[2,2,2,2])
+net = PreActResNet18(num_classes=2, thickness=64, blocks=[2,2,2,2])
 if args.resume:
     assert os.path.isdir(args.resume_dir)
     checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
