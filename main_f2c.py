@@ -85,14 +85,14 @@ for idx,a_class in enumerate(classes):
     elif a_class in ['bird', 'cat', 'deer', 'dog', 'frog', 'horse']:
         classes_f2c[idx] = 1
 
-#default is 01289
-classes_f2c = {}
-for i in range(len(classes)):
-    if str(i) in args.superclass:
-        classes_f2c[i] = 0
-    else:
-        classes_f2c[i] = 1
-logging.info("classes_f2c: {}".format(classes_f2c))
+# #default is 01289
+# classes_f2c = {}
+# for i in range(len(classes)):
+#     if str(i) in args.superclass:
+#         classes_f2c[i] = 0
+#     else:
+#         classes_f2c[i] = 1
+# logging.info("classes_f2c: {}".format(classes_f2c))
 
 # Model
 if args.resume:
