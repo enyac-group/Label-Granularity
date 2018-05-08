@@ -122,6 +122,6 @@ def conf_matrix(net, loader, num_classes=10):
 
 
 matrix = conf_matrix(net, testloader)
-print('confusion matrix: {}'.format(matrix))
+print('confusion matrix: \n{}'.format(matrix))
 pickle.dump(matrix, open(os.path.join(save_path, 'conf_matrix.pkl'), 'wb'))
 
