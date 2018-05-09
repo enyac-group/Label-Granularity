@@ -117,7 +117,7 @@ def conf_matrix(net, loader, num_classes=10):
     return cls_as
 
 
-matrix = conf_matrix(net, testloader, num_classes=20)
+matrix = conf_matrix(net, trainloader_unshuffle, num_classes=20) # choose train or test loader
 print('confusion matrix: \n{}'.format(matrix))
 pickle.dump(matrix, open(os.path.join(save_path, 'conf_matrix.pkl'), 'wb'))
 
