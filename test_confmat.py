@@ -27,6 +27,7 @@ import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 
+FINE = True
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -84,6 +85,9 @@ if args.resume:
     net = checkpoint['net']
     best_acc = checkpoint['acc']
     start_epoch = checkpoint['epoch']
+    # load fine label
+    if FINE:
+        label_f = pickle.load(open(os.path.join(args.resume_dir, 'label_f.pkl'), 'rb'))
 else:
     raise ValueError
 
@@ -104,6 +108,9 @@ def conf_matrix(net, loader, num_classes=10):
     all_targets = []
     cls_as = np.zeros((num_classes, num_classes))
     for batch_idx, (inputs, targets) in enumerate(loader):
+        if FINE:
+            for idx,target in enumerate(targets):
+                targets[idx] = int(label_f[input_idx[idx]])
         targ_cls = targets.numpy()
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
@@ -116,8 +123,11 @@ def conf_matrix(net, loader, num_classes=10):
 
     return cls_as
 
+if FINE:
+    matrix = conf_matrix(net, trainloader_unshuffle, num_classes=20) # choose train or test loader
+else:
+    matrix = conf_matrix(net, testloader, num_classes=10) # choose train or test loader
 
-matrix = conf_matrix(net, trainloader_unshuffle, num_classes=20) # choose train or test loader
 print('confusion matrix: \n{}'.format(matrix))
 pickle.dump(matrix, open(os.path.join(save_path, 'conf_matrix.pkl'), 'wb'))
 
@@ -125,12 +135,14 @@ pickle.dump(matrix, open(os.path.join(save_path, 'conf_matrix.pkl'), 'wb'))
 conf_matrix_nrm = matrix / matrix.sum(axis=0)
 conf_matrix_nrm = (conf_matrix_nrm + np.transpose(conf_matrix_nrm)) / 2.
 print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
-#classes = ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
-base_classes = ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
-classes = []
-for ele in base_classes:
-    classes.append(ele)
-    classes.append(ele)
+if FINE:
+    base_classes = ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+    classes = []
+    for ele in base_classes:
+        classes.append(ele)
+        classes.append(ele)
+else:
+    classes = ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
 
 df = pd.DataFrame(conf_matrix_nrm, columns=classes)
 df['classes'] = classes
