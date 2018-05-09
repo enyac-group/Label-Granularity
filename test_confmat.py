@@ -107,7 +107,7 @@ def conf_matrix(net, loader, num_classes=10):
     all_outputs = []
     all_targets = []
     cls_as = np.zeros((num_classes, num_classes))
-    for batch_idx, (inputs, targets) in enumerate(loader):
+    for batch_idx, (inputs, input_idx, targets) in enumerate(loader):
         if FINE:
             for idx,target in enumerate(targets):
                 targets[idx] = int(label_f[input_idx[idx]])
@@ -124,6 +124,8 @@ def conf_matrix(net, loader, num_classes=10):
     return cls_as
 
 if FINE:
+    trainset_unshuffle = dataset.data_cifar10_red.CIFAR10_RED(root='/home/rzding/DATA', train=True, download=True, transform=transform_test)
+    trainloader_unshuffle = torch.utils.data.DataLoader(trainset_unshuffle, batch_size=250, shuffle=False, num_workers=2)
     matrix = conf_matrix(net, trainloader_unshuffle, num_classes=20) # choose train or test loader
 else:
     matrix = conf_matrix(net, testloader, num_classes=10) # choose train or test loader
