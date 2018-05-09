@@ -71,13 +71,6 @@ trainset_unshuffle = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', trai
 trainloader_unshuffle = torch.utils.data.DataLoader(trainset_unshuffle, batch_size=250, shuffle=False, num_workers=2)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-#classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-classes_f2c = {}
-for idx,a_class in enumerate(classes):
-    if a_class in ['plane', 'car', 'ship', 'truck']:
-        classes_f2c[idx] = 0
-    elif a_class in ['bird', 'cat', 'deer', 'dog', 'frog', 'horse']:
-        classes_f2c[idx] = 1
 
 # Model
 if args.resume:
@@ -121,7 +114,50 @@ def conf_matrix(net, loader, num_classes=10):
     return cls_as
 
 
-matrix = conf_matrix(net, testloader)
+matrix = conf_matrix(net, testloader, num_classes=20)
 print('confusion matrix: \n{}'.format(matrix))
 pickle.dump(matrix, open(os.path.join(save_path, 'conf_matrix.pkl'), 'wb'))
 
+# Plot confusion matrix
+conf_matrix_nrm = matrix / matrix.sum(axis=0)
+conf_matrix_nrm = (conf_matrix_nrm + np.transpose(conf_matrix_nrm)) / 2.
+print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
+#classes = ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+base_classes = ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+classes = []
+for ele in base_classes:
+    classes.append(ele)
+    classes.append(ele)
+
+df = pd.DataFrame(conf_matrix_nrm, columns=classes)
+df['classes'] = classes
+df = df.set_index('classes')
+print(df)
+f, ax = plt.subplots(figsize=(12, 10))
+sns.heatmap(df, vmin=0, vmax=0.1, annot=True, ax=ax)
+fig = ax.get_figure()
+fig.savefig(os.path.join(save_path, 'conf_matrix.png'))
+
+# Compute Average Confusion Ratio
+def inter_conf(conf_mat, group):
+    conf_list = []
+    for i in range(len(conf_mat)):
+        for j in range(i+1, len(conf_mat[i])):
+            if not ([i,j] in group or [j,i] in group):
+                conf_list.append(conf_mat[i,j])
+    print('there are {} class pairs not in the same group'.format(len(conf_list)))
+    return sum(conf_list) / len(conf_list)
+
+def intra_conf(conf_mat, group):
+    conf_list = []
+    for i in range(len(conf_mat)):
+        for j in range(i+1, len(conf_mat[i])):
+            if ([i,j] in group or [j,i] in group):
+                conf_list.append(conf_mat[i,j])
+    print('there are {} class pairs in the same group'.format(len(conf_list)))
+    return sum(conf_list) / len(conf_list)
+
+coarse_conf = inter_conf(conf_matrix_nrm, [[i,i+1] for i in range(0,20,2)])
+fine_conf = intra_conf(conf_matrix_nrm, [[i,i+1] for i in range(0,20,2)])
+print('coarse ACR: {}'.format(coarse_conf))
+print('fine ACR: {}'.format(fine_conf))

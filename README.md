@@ -46,6 +46,21 @@ python plots.py --resume --resume_dir results/2018-05-07_23-48-19
 # Fine-tune pretrained (on 10) on 2
 python main_f2c.py --resume --resume_dir results/2018-05-04_11-25-10
 
+# Get and plot confusion matrix from A_10_20 settings
+python test_confmat.py --resume --resume_dir results/2018-05-04_11-25-10
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Train CIFAR10 with PyTorch
 
 I'm playing with [PyTorch](http://pytorch.org/) on the CIFAR10 dataset.
