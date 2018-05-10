@@ -33,7 +33,7 @@ def make_dataset(dir, class_to_idx, extensions, class_list):
         d = os.path.join(dir, target)
         if not os.path.isdir(d):
             continue
-        if True: #class_to_idx[target] in class_list: # make sure that only class in class_list is collected
+        if class_to_idx[target] in class_list: # make sure that only class in class_list is collected
             print('found class {}, with path {}'.format(class_to_idx[target], d))
             cnt = 0
             for root, _, fnames in sorted(os.walk(d)):
@@ -133,6 +133,7 @@ class DatasetFolder(data.Dataset):
         """
         path, target = self.samples[index]
         sample = self.loader(path)
+        print(sample)
         if self.transform is not None:
             sample = self.transform(sample)
         if self.target_transform is not None:
