@@ -140,6 +140,7 @@ regime = {
         'weight_decay': 1e-4, 'momentum': 0.9},
     60: {'lr': 1e-3},
     90: {'lr': 1e-4},
+    120: {'lr': 1e-5},
 }
 
 logging.info('training regime: %s', regime)
@@ -236,8 +237,8 @@ def test(epoch, f2c=False, train_f=True):
         best_acc = acc
 
 
-start_epoch = 0
-for epoch in range(start_epoch, start_epoch+120):
+#start_epoch = 0
+for epoch in range(start_epoch, 150):
     train(epoch, f2c=False)
     test(epoch, f2c=False)
     test(epoch, f2c=True, train_f=True)
