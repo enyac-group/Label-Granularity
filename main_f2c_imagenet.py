@@ -237,7 +237,7 @@ def test(epoch, f2c=False, train_f=True):
 
 
 start_epoch = 0
-for epoch in range(start_epoch, start_epoch+200):
+for epoch in range(start_epoch, start_epoch+120):
     train(epoch, f2c=False)
     test(epoch, f2c=False)
     test(epoch, f2c=True, train_f=True)

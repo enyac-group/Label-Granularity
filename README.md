@@ -47,7 +47,11 @@ python plots.py --resume --resume_dir results/2018-05-07_23-48-19
 python main_f2c.py --resume --resume_dir results/2018-05-04_11-25-10
 
 # Get and plot confusion matrix from A_10_20 settings
-python test_confmat.py --resume --resume_dir results/2018-04-24_19-06-00
+python test_confmat.py --resume --resume_dir results/2018-05-04_15-00-34
+
+# Train on ImageNet
+
+
 
 
 
