@@ -50,7 +50,7 @@ python main_f2c.py --resume --resume_dir results/2018-05-04_11-25-10
 python test_confmat.py --resume --resume_dir results/2018-05-04_15-00-34
 
 # Train on ImageNet
-
+python main_f2c_imagenet.py 
 
 
 
