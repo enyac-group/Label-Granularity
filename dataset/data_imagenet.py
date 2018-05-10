@@ -133,7 +133,6 @@ class DatasetFolder(data.Dataset):
         """
         path, target = self.samples[index]
         sample = self.loader(path)
-        print(sample)
         if self.transform is not None:
             sample = self.transform(sample)
         if self.target_transform is not None:
