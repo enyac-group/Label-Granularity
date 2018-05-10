@@ -102,7 +102,7 @@ else:
     print('==> Building model..')
     # net = VGG('VGG8')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=10, thickness=16, blocks=[2,2,2,2])
+    net = PreActResNet18(num_classes=2, thickness=16, blocks=[2,2,2,2])
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
@@ -239,8 +239,8 @@ def test(epoch, f2c=False, train_f=True):
 
 #start_epoch = 0
 for epoch in range(start_epoch, 150):
-    train(epoch, f2c=False)
-    test(epoch, f2c=False)
-    test(epoch, f2c=True, train_f=True)
+    train(epoch, f2c=True)
+    #test(epoch, f2c=False)
+    test(epoch, f2c=True, train_f=False)
 
 # test(0, f2c=True, train_f=True)

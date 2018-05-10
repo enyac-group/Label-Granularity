@@ -51,6 +51,8 @@ python test_confmat.py --resume --resume_dir results/2018-05-04_15-00-34
 
 # Train on ImageNet
 python main_f2c_imagenet.py 
+# resume training:
+python main_f2c_imagenet.py --resume --resume_dir results/2018-05-10_15-53-57
 
 
 
