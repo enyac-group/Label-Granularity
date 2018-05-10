@@ -35,12 +35,15 @@ def make_dataset(dir, class_to_idx, extensions, class_list):
             continue
         if class_to_idx[target] in class_list: # make sure that only class in class_list is collected
             print('found class {}, with path {}'.format(class_to_idx[target], d))
+            cnt = 0
             for root, _, fnames in sorted(os.walk(d)):
                 for fname in sorted(fnames):
                     if has_file_allowed_extension(fname, extensions):
                         path = os.path.join(root, fname)
                         item = (path, class_to_idx[target])
                         images.append(item)
+                        cnt += 1
+            print('total img: {}'.format(cnt))
                 
 
     return images
@@ -93,7 +96,6 @@ class DatasetFolder(data.Dataset):
                 fn = line.strip().split(' ')[0]
                 label = int(line.strip().split(' ')[1])
                 if label in class_list:
-                    print('found eval class {}'.format(label))
                     samples.append((os.path.join(root,fn), label))
 
         print('a sample: {}'.format(samples[-1]))
