@@ -22,6 +22,7 @@ from utils import progress_bar, adjust_optimizer, setup_logging
 from torch.autograd import Variable
 from datetime import datetime
 import logging
+import dataset
 
 
 transform_train = transforms.Compose([
@@ -38,6 +39,7 @@ transform_test = transforms.Compose([
 
 #trainset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
 trainset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=None)
+trainset = dataset.ImageFolder(root=, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=1, shuffle=True, num_workers=2)
 
 #testset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_train)

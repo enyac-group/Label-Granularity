@@ -26,20 +26,21 @@ def find_classes(dir):
     return classes, class_to_idx
 
 
-def make_dataset(dir, class_to_idx, extensions):
+def make_dataset(dir, class_to_idx, extensions, class_list):
     images = []
     dir = os.path.expanduser(dir)
     for target in sorted(os.listdir(dir)):
         d = os.path.join(dir, target)
         if not os.path.isdir(d):
             continue
-
-        for root, _, fnames in sorted(os.walk(d)):
-            for fname in sorted(fnames):
-                if has_file_allowed_extension(fname, extensions):
-                    path = os.path.join(root, fname)
-                    item = (path, class_to_idx[target])
-                    images.append(item)
+        if class_to_idx[target] in class_list: # make sure that only class in class_list is collected
+            print('found class {}'.format(target))
+            for root, _, fnames in sorted(os.walk(d)):
+                for fname in sorted(fnames):
+                    if has_file_allowed_extension(fname, extensions):
+                        path = os.path.join(root, fname)
+                        item = (path, class_to_idx[target])
+                        images.append(item)
 
     return images
 
@@ -71,9 +72,32 @@ class DatasetFolder(data.Dataset):
         samples (list): List of (sample path, class_index) tuples
     """
 
-    def __init__(self, root, loader, extensions, transform=None, target_transform=None):
-        classes, class_to_idx = find_classes(root)
-        samples = make_dataset(root, class_to_idx, extensions)
+    def __init__(self, root, train, class_list, loader, extensions, transform=None, target_transform=None):
+        if train:
+            f = open('/home/zhuo/caffe/data/ilsvrc12/train.txt', 'r')
+            lines = f.readlines()
+            classes = [line.strip().split('/')[0] for line in lines]
+            idx = [int(line.strip().split(' ')[1]) for line in lines]
+            class_to_idx = {classes[i]:idx[i] for i in range(len(classes))}
+            classes = [d for d in os.listdir(root) if os.path.isdir(os.path.join(root, d))]
+            assert len(classes) == len(class_to_idx)
+            samples = make_dataset(root, class_to_idx, extensions, class_list)
+        else:
+            class_to_idx = None
+            classes = None
+            f = open('/home/zhuo/caffe/data/ilsvrc12/val.txt', 'r')
+            lines = f.readlines()
+            samples = []
+            for line in lines:
+                fn = line.strip().split(' ')[0]
+                label = int(line.strip().split(' ')[1])
+                if label in class_list:
+                    samples.append((os.path.join(root,fn), label))
+
+        print('a sample: {}'.format(samples[-1]))
+        print('sample size: {}'.format(len(samples)))
+            
+
         if len(samples) == 0:
             raise(RuntimeError("Found 0 files in subfolders of: " + root + "\n"
                                "Supported extensions are: " + ",".join(extensions)))
@@ -88,6 +112,12 @@ class DatasetFolder(data.Dataset):
 
         self.transform = transform
         self.target_transform = target_transform
+        self.class_list = class_list
+
+        global_2_subset = {}
+        for i,val in enumerate(class_list):
+            global_2_subset[val] = i
+        self.global_2_subset = global_2_subset
 
     def __getitem__(self, index):
         """
@@ -104,6 +134,8 @@ class DatasetFolder(data.Dataset):
         if self.target_transform is not None:
             target = self.target_transform(target)
 
+        # transform to subset label index
+        target = self.global_2_subset[target]
         return sample, target
 
     def __len__(self):
@@ -120,7 +152,7 @@ class DatasetFolder(data.Dataset):
         return fmt_str
 
 
-IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif']
+IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif', '.JPEG']
 
 
 def pil_loader(path):
@@ -171,9 +203,13 @@ class ImageFolder(DatasetFolder):
         class_to_idx (dict): Dict with items (class_name, class_index).
         imgs (list): List of (image path, class_index) tuples
     """
-    def __init__(self, root, transform=None, target_transform=None,
+    def __init__(self, root, train, class_list, transform=None, target_transform=None,
                  loader=default_loader):
-        super(ImageFolder, self).__init__(root, loader, IMG_EXTENSIONS,
+        if train:
+            root = '/home/zhuo/train'
+        else:
+            root = '/home/zhuo/val'
+        super(ImageFolder, self).__init__(root, train, class_list, loader, IMG_EXTENSIONS,
                                           transform=transform,
                                           target_transform=target_transform)
         self.imgs = self.samples
