@@ -24,8 +24,8 @@ from datetime import datetime
 import logging
 import numpy as np
 import pickle
+import dataset
 
-NUM_CLASSES = 20
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR100 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -33,6 +33,10 @@ parser.add_argument('--resume', '-r', action='store_true', help='resume from che
 parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
                     help='results dir')
 parser.add_argument('--resume_dir', default=None, help='resume dir')
+parser.add_argument('--gpus', default='0', help='gpus used')
+parser.add_argument('--f2c', type=int, default=None, help='whether use coarse label')
+parser.add_argument('--categories', default=None, help='which classes to use')
+parser.add_argument('--data_ratio', type=float, default=1., help='ratio of training data to use')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -55,25 +59,6 @@ use_cuda = torch.cuda.is_available()
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 
-# Data
-print('==> Preparing data..')
-transform_train = transforms.Compose([
-    transforms.RandomCrop(32, padding=4),
-    transforms.RandomHorizontalFlip(),
-    transforms.ToTensor(),
-    transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761)),
-])
-
-transform_test = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761)),
-])
-
-trainset = torchvision.datasets.CIFAR100(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, num_workers=2)
-
-testset = torchvision.datasets.CIFAR100(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
-testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
 
 coarse_classes = ('aquatic_mammals', 'fish', 'flowers', 'food_containers', 
                 'fruit_and_vegetables', 'household_electrical_devices', 
@@ -122,26 +107,82 @@ classes_c2f = {'aquatic_mammals': ['beaver','dolphin','otter','seal','whale'],
                 'vehicles_1': ['bicycle','bus','motorcycle','pickup_truck','train'], 
                 'vehicles_2': ['lawn_mower','rocket','streetcar','tank','tractor']}
 
-classes_f2c = {}
-for idx,f_class in enumerate(fine_classes):
-    for jdx,c_class in enumerate(coarse_classes):
-        if f_class in classes_c2f[c_class]:
-            classes_f2c[idx] = jdx
-    if idx not in classes_f2c:
-        print(idx)
-        raise ValueError()
+# classes_f2c = {}
+# for idx,f_class in enumerate(fine_classes):
+#     for jdx,c_class in enumerate(coarse_classes):
+#         if f_class in classes_c2f[c_class]:
+#             classes_f2c[idx] = jdx
+#     if idx not in classes_f2c:
+#         print(idx)
+#         raise ValueError()
 
-# # Randomly re-define super classes
-# for i in range(50):
-#     idx = np.random.randint(0, 100)
-#     jdx = np.random.randint(0, 100)
-#     classes_f2c[idx], classes_f2c[jdx] = classes_f2c[jdx], classes_f2c[idx]
-# pickle.dump(classes_f2c, open(os.path.join(save_path, 'classes_f2c.pkl'), 'wb'))
-# logging.info('classes_f2c: {}'.format(classes_f2c))
+# # # Randomly re-define super classes
+# # for i in range(50):
+# #     idx = np.random.randint(0, 100)
+# #     jdx = np.random.randint(0, 100)
+# #     classes_f2c[idx], classes_f2c[jdx] = classes_f2c[jdx], classes_f2c[idx]
+# # pickle.dump(classes_f2c, open(os.path.join(save_path, 'classes_f2c.pkl'), 'wb'))
+# # logging.info('classes_f2c: {}'.format(classes_f2c))
 
-# load classes_f2c from pkl
-classes_f2c = pickle.load(open('results/2018-04-30_13-58-59/classes_f2c.pkl', 'rb'))
-logging.info('loading classes_f2c from: {}'.format('2018-04-30_13-58-59'))
+# # load classes_f2c from pkl
+# classes_f2c = pickle.load(open('results/2018-04-30_13-58-59/classes_f2c.pkl', 'rb'))
+# logging.info('loading classes_f2c from: {}'.format('2018-04-30_13-58-59'))
+
+
+if args.categories == 'animals':
+    super_class_names = ['aquatic_mammals', 'fish', 'insects', 'large_carnivores', 'large_omnivores_and_herbivores', 'medium_mammals', 
+                        'non-insect_invertebrates', 'people', 'reptiles', 'small_mammals']
+    fine_class_names = []
+    for super_class in super_class_names:
+        fine_class_names += classes_c2f[super_class]
+    class_idx = {name:idx for idx,name in enumerate(fine_classes)}
+    classes = [class_idx[name] for name in fine_class_names]
+    classes_f2c = {}
+    for idx,a_class in enumerate(classes):
+        for jdx,super_class in enumerate(super_class_names):
+            if fine_classes[a_class] in classes_c2f[super_class]:
+                classes_f2c[idx] = jdx
+    print('classes_f2c: {}'.format(classes_f2c))
+    if args.f2c == 1:
+        NUM_CLASSES = 10
+    else:
+        NUM_CLASSES = 50
+elif args.categories == None:
+    classes_f2c = {}
+    for idx,f_class in enumerate(fine_classes):
+        for jdx,c_class in enumerate(coarse_classes):
+            if f_class in classes_c2f[c_class]:
+                classes_f2c[idx] = jdx
+        if idx not in classes_f2c:
+            print(idx)
+            raise ValueError()
+    if args.f2c == 1:
+        NUM_CLASSES = 20
+    else:
+        NUM_CLASSES = 100
+
+# Data
+print('==> Preparing data..')
+transform_train = transforms.Compose([
+    transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761)),
+])
+
+transform_test = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761)),
+])
+
+#trainset = torchvision.datasets.CIFAR100(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
+trainset = dataset.data_cifar100.CIFAR100(root='/home/rzding/DATA', train=True, download=True, class_list=classes, transform=transform_train, data_ratio=args.data_ratio)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, num_workers=2)
+
+#testset = torchvision.datasets.CIFAR100(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
+testset = dataset.data_cifar100.CIFAR100(root='/home/rzding/DATA', train=False, download=True, class_list=classes, transform=transform_test, data_ratio=1.)
+testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
+
 
 # Model
 if args.resume:
@@ -173,7 +214,8 @@ logging.info("number of parameters: %d", num_parameters)
 
 if use_cuda:
     net.cuda()
-    net = torch.nn.DataParallel(net, device_ids=[0])
+    logging.info('gpus: {}'.format([int(ele) for ele in args.gpus]))
+    net = torch.nn.DataParallel(net, device_ids=[int(ele) for ele in args.gpus])
     cudnn.benchmark = True
 
 criterion = nn.CrossEntropyLoss()
@@ -187,12 +229,14 @@ regime = {
 }
 logging.info('training regime: %s', regime)
 
+
 # Training
 def train(epoch, f2c=False):
     print('\nEpoch: %d' % epoch)
     net.train()
     train_loss = 0
     correct = 0
+    correct_f2c = 0
     total = 0
     global optimizer
     optimizer = adjust_optimizer(optimizer, epoch, regime)
@@ -204,7 +248,7 @@ def train(epoch, f2c=False):
             inputs, targets = inputs.cuda(), targets.cuda()
         optimizer.zero_grad()
         inputs, targets = Variable(inputs), Variable(targets)
-        outputs, feat = net(inputs)
+        outputs, _ = net(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
@@ -214,15 +258,31 @@ def train(epoch, f2c=False):
         total += targets.size(0)
         correct += predicted.eq(targets.data).cpu().sum()
 
+        if f2c == False:
+            predicted_np = predicted.cpu().numpy()
+            for idx,a_predicted in enumerate(predicted_np):
+                predicted_np[idx] = classes_f2c[a_predicted]
+            correct_f2c += (predicted_np == targets.data.cpu().numpy()).sum()
+
         #progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
         #    % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
         if batch_idx % 10 == 0:
-            logging.info('\n Epoch: [{0}][{1}/{2}]\t'
-                        'Training Loss {train_loss:.3f} \t'
-                        'Training Prec@1 {train_prec1:.3f} \t'
-                        .format(epoch, batch_idx, len(trainloader),
-                        train_loss=train_loss/(batch_idx+1), 
-                        train_prec1=100.*correct/total))
+            if f2c:
+                logging.info('\n Epoch: [{0}][{1}/{2}]\t'
+                            'Training Loss {train_loss:.3f} \t'
+                            'Training Prec@1 {train_prec1:.3f} \t'
+                            .format(epoch, batch_idx, len(trainloader),
+                            train_loss=train_loss/(batch_idx+1), 
+                            train_prec1=100.*correct/total))
+            else:
+                logging.info('\n Epoch: [{0}][{1}/{2}]\t'
+                            'Training Loss {train_loss:.3f} \t'
+                            'Training Prec@1 {train_prec1:.3f} \t'
+                            'Training Prec@1 f2c {train_prec1_f2c:.3f} \t'
+                            .format(epoch, batch_idx, len(trainloader),
+                            train_loss=train_loss/(batch_idx+1), 
+                            train_prec1=100.*correct/total,
+                            train_prec1_f2c=100.*correct_f2c/total))
 
 
 def test(epoch, f2c=False, train_f=True):
@@ -238,7 +298,7 @@ def test(epoch, f2c=False, train_f=True):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
-        outputs, feat = net(inputs)
+        outputs, _ = net(inputs)
         loss = criterion(outputs, targets)
 
         test_loss += loss.data[0]
@@ -268,7 +328,7 @@ def test(epoch, f2c=False, train_f=True):
 
     # Save checkpoint.
     acc = 100.*correct/total
-    if acc > best_acc and args.resume_dir is None and not (train_f and f2c):
+    if acc > best_acc and args.resume_dir is None:
         print('Saving..')
         state = {
             'net': net.module if use_cuda else net,
@@ -280,9 +340,16 @@ def test(epoch, f2c=False, train_f=True):
 
 
 
-# for epoch in range(start_epoch, start_epoch+200):
-#     train(epoch, f2c=True)
-#     #test(epoch, f2c=False)
-#     test(epoch, f2c=True, train_f=False)
+if args.f2c == 1:
+    for epoch in range(start_epoch, 200):
+        train(epoch, f2c=True)
+        #test(epoch, f2c=False)
+        test(epoch, f2c=True, train_f=False)
+elif args.f2c == 0:
+    for epoch in range(start_epoch, 200):
+        train(epoch, f2c=False)
+        test(epoch, f2c=False)
+        test(epoch, f2c=True, train_f=True)
 
-test(0, f2c=True, train_f=True)
+
+# test(0, f2c=True, train_f=True)

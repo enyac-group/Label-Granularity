@@ -76,7 +76,7 @@ class DatasetFolder(data.Dataset):
         samples (list): List of (sample path, class_index) tuples
     """
 
-    def __init__(self, root, train, class_list, loader, extensions, transform=None, target_transform=None):
+    def __init__(self, root, train, class_list, loader, extensions, transform=None, target_transform=None, data_ratio=1.):
         if train:
             f = open('/home/zhuo/caffe/data/ilsvrc12/train.txt', 'r')
             lines = f.readlines()
@@ -86,6 +86,11 @@ class DatasetFolder(data.Dataset):
             classes = [d for d in os.listdir(root) if os.path.isdir(os.path.join(root, d))]
             assert len(classes) == len(class_to_idx)
             samples = make_dataset(root, class_to_idx, extensions, class_list)
+            if data_ratio < 1.:
+                samples_per_class = {}
+                for a_class in class_list:
+                    samples_per_class[a_class] = [a_sample for a_sample in samples if a_sample[1] == a_class]
+                samples = [samples_per_class[a_class][0:int(len(samples_per_class[a_class])*data_ratio)] for a_class in samples_per_class]
         else:
             class_to_idx = None
             classes = None
@@ -208,12 +213,12 @@ class ImageFolder(DatasetFolder):
         imgs (list): List of (image path, class_index) tuples
     """
     def __init__(self, root, train, class_list, transform=None, target_transform=None,
-                 loader=default_loader):
+                 loader=default_loader, data_ratio=1.):
         if train:
             root = '/home/zhuo/train'
         else:
             root = '/home/zhuo/val'
         super(ImageFolder, self).__init__(root, train, class_list, loader, IMG_EXTENSIONS,
                                           transform=transform,
-                                          target_transform=target_transform)
+                                          target_transform=target_transform, data_ratio=data_ratio)
         self.imgs = self.samples

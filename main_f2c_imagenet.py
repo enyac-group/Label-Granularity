@@ -35,6 +35,7 @@ parser.add_argument('--superclass', default=None, help='one of the super class')
 parser.add_argument('--gpus', default='0', help='gpus used')
 parser.add_argument('--f2c', type=int, default=None, help='whether use coarse label')
 parser.add_argument('--categories', default=None, help='which classes to use')
+parser.add_argument('--data_ratio', type=float, default=1., help='ratio of training data to use')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -102,10 +103,10 @@ transform_test = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
-trainset = dataset.data_imagenet.ImageFolder(root=None, train=True, class_list=classes, transform=transform_train)
+trainset = dataset.data_imagenet.ImageFolder(root=None, train=True, class_list=classes, transform=transform_train, data_ratio=args.data_ratio)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=32, shuffle=True, num_workers=2)
 
-testset = dataset.data_imagenet.ImageFolder(root=None, train=False, class_list=classes, transform=transform_train)
+testset = dataset.data_imagenet.ImageFolder(root=None, train=False, class_list=classes, transform=transform_train, data_ratio=1.)
 testloader = torch.utils.data.DataLoader(testset, batch_size=32, shuffle=False, num_workers=2)
 
 
@@ -171,6 +172,7 @@ def train(epoch, f2c=False):
     net.train()
     train_loss = 0
     correct = 0
+    correct_f2c = 0
     total = 0
     global optimizer
     optimizer = adjust_optimizer(optimizer, epoch, regime)
@@ -192,15 +194,31 @@ def train(epoch, f2c=False):
         total += targets.size(0)
         correct += predicted.eq(targets.data).cpu().sum()
 
+        if f2c == False:
+            predicted_np = predicted.cpu().numpy()
+            for idx,a_predicted in enumerate(predicted_np):
+                predicted_np[idx] = classes_f2c[a_predicted]
+            correct_f2c += (predicted_np == targets.data.cpu().numpy()).sum()
+
         #progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
         #    % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
         if batch_idx % 10 == 0:
-            logging.info('\n Epoch: [{0}][{1}/{2}]\t'
-                        'Training Loss {train_loss:.3f} \t'
-                        'Training Prec@1 {train_prec1:.3f} \t'
-                        .format(epoch, batch_idx, len(trainloader),
-                        train_loss=train_loss/(batch_idx+1), 
-                        train_prec1=100.*correct/total))
+            if f2c:
+                logging.info('\n Epoch: [{0}][{1}/{2}]\t'
+                            'Training Loss {train_loss:.3f} \t'
+                            'Training Prec@1 {train_prec1:.3f} \t'
+                            .format(epoch, batch_idx, len(trainloader),
+                            train_loss=train_loss/(batch_idx+1), 
+                            train_prec1=100.*correct/total))
+            else:
+                logging.info('\n Epoch: [{0}][{1}/{2}]\t'
+                            'Training Loss {train_loss:.3f} \t'
+                            'Training Prec@1 {train_prec1:.3f} \t'
+                            'Training Prec@1 f2c {train_prec1_f2c:.3f} \t'
+                            .format(epoch, batch_idx, len(trainloader),
+                            train_loss=train_loss/(batch_idx+1), 
+                            train_prec1=100.*correct/total,
+                            train_prec1_f2c=100.*correct_f2c/total))
 
 
 def test(epoch, f2c=False, train_f=True):

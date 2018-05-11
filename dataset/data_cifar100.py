@@ -46,7 +46,7 @@ class CIFAR100(data.Dataset):
 
     def __init__(self, root, train=True,
                  transform=None, target_transform=None,
-                 download=False):
+                 download=False, class_list=None, data_ratio=1.):
 
         coarse_classes = ('aquatic_mammals', 'fish', 'flowers', 'food_containers', 
                 'fruit_and_vegetables', 'household_electrical_devices', 
@@ -95,16 +95,16 @@ class CIFAR100(data.Dataset):
                         'vehicles_1': ['bicycle','bus','motorcycle','pickup_truck','train'], 
                         'vehicles_2': ['lawn_mower','rocket','streetcar','tank','tractor']}
 
-        classes_f2c = {}
-        for idx,f_class in enumerate(fine_classes):
-            for jdx,c_class in enumerate(coarse_classes):
-                if f_class in classes_c2f[c_class]:
-                    classes_f2c[idx] = jdx
-            if idx not in classes_f2c:
-                print(idx)
-                raise ValueError()
+        # classes_f2c = {}
+        # for idx,f_class in enumerate(fine_classes):
+        #     for jdx,c_class in enumerate(coarse_classes):
+        #         if f_class in classes_c2f[c_class]:
+        #             classes_f2c[idx] = jdx
+        #     if idx not in classes_f2c:
+        #         print(idx)
+        #         raise ValueError()
 
-        self.classes_f2c = classes_f2c
+        # self.classes_f2c = classes_f2c
 
         self.root = os.path.expanduser(root)
         self.transform = transform
@@ -157,6 +157,18 @@ class CIFAR100(data.Dataset):
             self.test_data = self.test_data.reshape((10000, 3, 32, 32))
             self.test_data = self.test_data.transpose((0, 2, 3, 1))  # convert to HWC
 
+        # get subset of self.train_data, self.train_labels, self.test_data, self.test_labels
+        idx = np.zeros(self.train_labels.shape, dtype=bool)
+        for a_class in class_list:
+            idx = np.logical_or(idx, self.train_labels == a_class)
+        self.train_data = self.train_data[idx]
+        self.train_labels = self.train_labels[idx]
+        idx = np.zeros(self.test_labels.shape, dtype=bool)
+        for a_class in class_list:
+            idx = np.logical_or(idx, self.test_labels == a_class)
+        self.test_data = self.test_data[idx]
+        self.test_labels = self.test_labels[idx]
+
     def __getitem__(self, index):
         """
         Args:
@@ -183,14 +195,15 @@ class CIFAR100(data.Dataset):
         # map target
         #target = self.classes_f2c[target]
 
-        return np.asarray(img), index, target
+        #return np.asarray(img), index, target
+        return np.asarray(img), target
 
 
     def __len__(self):
         if self.train:
-            return 50000
+            return len(self.train_data)
         else:
-            return 10000
+            return len(self.test_data)
 
     def _check_integrity(self):
         root = self.root
