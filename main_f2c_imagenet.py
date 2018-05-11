@@ -80,6 +80,11 @@ elif args.categories == 'fruit_vege':
         elif a_class in [936, 937, 938, 939, 942, 943, 944, 945, 947]: # vegetables
             classes_f2c[idx] = 1
 
+if args.f2c:
+    NUM_CLASS = 2
+else:
+    NUM_CLASS = len(classes_f2c)
+
 
 transform_train = transforms.Compose([
     transforms.RandomResizedCrop(224),
@@ -115,7 +120,7 @@ else:
     print('==> Building model..')
     # net = VGG('VGG8')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=2, thickness=16, blocks=[2,2,2,2])
+    net = PreActResNet18(num_classes=NUM_CLASS, thickness=16, blocks=[2,2,2,2])
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
