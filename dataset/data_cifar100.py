@@ -165,6 +165,8 @@ class CIFAR100(data.Dataset):
                 idx = np.logical_or(idx, self.train_labels == a_class)
             self.train_data = self.train_data[idx]
             self.train_labels = self.train_labels[idx]
+            label_mapping = {a_class:idx for idx,a_class in enumerate(class_list)}
+            self.train_labels = [label_mapping[a_label] for a_label in self.train_labels]
             print('training size: {}'.format(len(self.train_data)))
         else:
             self.test_labels = np.array(self.test_labels)
@@ -173,6 +175,8 @@ class CIFAR100(data.Dataset):
                 idx = np.logical_or(idx, self.test_labels == a_class)
             self.test_data = self.test_data[idx]
             self.test_labels = self.test_labels[idx]
+            label_mapping = {a_class:idx for idx,a_class in enumerate(class_list)}
+            self.test_labels = [label_mapping[a_label] for a_label in self.test_labels]
             print('testing size: {}'.format(len(self.test_data)))
 
     def __getitem__(self, index):
