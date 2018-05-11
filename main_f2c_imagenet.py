@@ -33,7 +33,7 @@ parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
 parser.add_argument('--resume_dir', default=None, help='resume dir')
 parser.add_argument('--superclass', default=None, help='one of the super class')
 parser.add_argument('--gpus', default='0', help='gpus used')
-parser.add_argument('--f2c', type=bool, default=False, help='whether use coarse label')
+parser.add_argument('--f2c', type=int, default=None, help='whether use coarse label')
 parser.add_argument('--categories', default=None, help='which classes to use')
 args = parser.parse_args()
 
@@ -80,10 +80,12 @@ elif args.categories == 'fruit_vege':
         elif a_class in [936, 937, 938, 939, 942, 943, 944, 945, 947]: # vegetables
             classes_f2c[idx] = 1
 
-if args.f2c:
+if args.f2c == 1:
     NUM_CLASS = 2
-else:
+elif args.f2c == 0:
     NUM_CLASS = len(classes_f2c)
+else:
+    raise ValueError
 
 
 transform_train = transforms.Compose([
@@ -257,12 +259,12 @@ def test(epoch, f2c=False, train_f=True):
 
 #start_epoch = 0
 
-if args.f2c:
+if args.f2c == 1:
     for epoch in range(start_epoch, 150):
         train(epoch, f2c=True)
         #test(epoch, f2c=False)
         test(epoch, f2c=True, train_f=False)
-else:
+elif args.f2c == 0:
     for epoch in range(start_epoch, 150):
         train(epoch, f2c=False)
         test(epoch, f2c=False)
