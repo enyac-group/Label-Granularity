@@ -33,6 +33,8 @@ parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
 parser.add_argument('--resume_dir', default=None, help='resume dir')
 parser.add_argument('--superclass', default=None, help='one of the super class')
 parser.add_argument('--gpus', default='0', help='gpus used')
+parser.add_argument('--f2c', type=bool, default=False, help='whether use coarse label')
+parser.add_argument('--categories', default=None, help='which classes to use')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -60,13 +62,24 @@ start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 # Data
 print('==> Preparing data..')
 
-classes = (151, 153, 154, 157, 161, 281, 282, 283, 284, 285)
-classes_f2c = {}
-for idx,a_class in enumerate(classes):
-    if a_class in [151, 153, 154, 157, 161]: # dogs
-        classes_f2c[idx] = 0
-    elif a_class in [281, 282, 283, 284, 285]: # cats
-        classes_f2c[idx] = 1
+if args.categories == 'dog_cat':
+    classes = (151, 153, 154, 157, 161, 281, 282, 283, 284, 285)
+    classes_f2c = {}
+    for idx,a_class in enumerate(classes):
+        if a_class in [151, 153, 154, 157, 161]: # dogs
+            classes_f2c[idx] = 0
+        elif a_class in [281, 282, 283, 284, 285]: # cats
+            classes_f2c[idx] = 1
+elif args.categories == 'fruit_vege':
+    classes = (949, 950, 951, 952, 953, 954, 955, 956, 936, 937, 938, 939, 942,
+                943, 944, 945, 947)
+    classes_f2c = {}
+    for idx,a_class in enumerate(classes):
+        if a_class in [949, 950, 951, 952, 953, 954, 955, 956]: # fruits
+            classes_f2c[idx] = 0
+        elif a_class in [936, 937, 938, 939, 942, 943, 944, 945, 947]: # vegetables
+            classes_f2c[idx] = 1
+
 
 transform_train = transforms.Compose([
     transforms.RandomResizedCrop(224),
@@ -238,9 +251,17 @@ def test(epoch, f2c=False, train_f=True):
 
 
 #start_epoch = 0
-for epoch in range(start_epoch, 150):
-    train(epoch, f2c=True)
-    #test(epoch, f2c=False)
-    test(epoch, f2c=True, train_f=False)
+
+if args.f2c:
+    for epoch in range(start_epoch, 150):
+        train(epoch, f2c=True)
+        #test(epoch, f2c=False)
+        test(epoch, f2c=True, train_f=False)
+else:
+    for epoch in range(start_epoch, 150):
+        train(epoch, f2c=False)
+        test(epoch, f2c=False)
+        test(epoch, f2c=True, train_f=True)
+    
 
 # test(0, f2c=True, train_f=True)
