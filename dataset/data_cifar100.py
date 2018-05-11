@@ -158,11 +158,13 @@ class CIFAR100(data.Dataset):
             self.test_data = self.test_data.transpose((0, 2, 3, 1))  # convert to HWC
 
         # get subset of self.train_data, self.train_labels, self.test_data, self.test_labels
+        self.train_labels = np.array(self.train_labels)
         idx = np.zeros(self.train_labels.shape, dtype=bool)
         for a_class in class_list:
             idx = np.logical_or(idx, self.train_labels == a_class)
         self.train_data = self.train_data[idx]
         self.train_labels = self.train_labels[idx]
+        self.test_labels = np.array(self.test_labels)
         idx = np.zeros(self.test_labels.shape, dtype=bool)
         for a_class in class_list:
             idx = np.logical_or(idx, self.test_labels == a_class)
