@@ -160,6 +160,8 @@ elif args.categories == None:
         NUM_CLASSES = 20
     else:
         NUM_CLASSES = 100
+else:
+    raise ValueError
 
 # Data
 print('==> Preparing data..')
