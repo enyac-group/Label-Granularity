@@ -264,6 +264,8 @@ def train(epoch, f2c=False):
             predicted_np = predicted.cpu().numpy()
             for idx,a_predicted in enumerate(predicted_np):
                 predicted_np[idx] = classes_f2c[a_predicted]
+            print('predict: {}'.format(predicted_np))
+            print('targets: {}'.format(targets.data.cpu().numpy()))
             correct_f2c += (predicted_np == targets.data.cpu().numpy()).sum()
 
         #progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
