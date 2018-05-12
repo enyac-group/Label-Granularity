@@ -87,10 +87,11 @@ class DatasetFolder(data.Dataset):
             assert len(classes) == len(class_to_idx)
             samples = make_dataset(root, class_to_idx, extensions, class_list)
             if data_ratio < 1.:
-                samples_per_class = {}
+                samples_reduced = []
                 for a_class in class_list:
-                    samples_per_class[a_class] = [a_sample for a_sample in samples if a_sample[1] == a_class]
-                samples = [samples_per_class[a_class][0:int(len(samples_per_class[a_class])*data_ratio)] for a_class in samples_per_class]
+                    samples_per_class = [a_sample for a_sample in samples if a_sample[1] == a_class]
+                    samples_reduced += samples_per_class[0:int(len(samples_per_class)*data_ratio)]
+                samples = samples_reduced
         else:
             class_to_idx = None
             classes = None
