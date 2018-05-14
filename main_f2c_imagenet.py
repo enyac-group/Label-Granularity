@@ -123,7 +123,7 @@ else:
     print('==> Building model..')
     # net = VGG('VGG8')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=NUM_CLASS, thickness=16, blocks=[2,2,2,2])
+    net = PreActResNet18(num_classes=NUM_CLASS, thickness=16, blocks=[2,2,2,2], dropout=0.)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()

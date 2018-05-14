@@ -15,11 +15,12 @@ class PreActBlock(nn.Module):
     '''Pre-activation version of the BasicBlock.'''
     expansion = 1
 
-    def __init__(self, in_planes, planes, stride=1):
+    def __init__(self, in_planes, planes, stride=1, dropout=0.):
         super(PreActBlock, self).__init__()
         self.bn1 = nn.BatchNorm2d(in_planes)
         self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
+        self.dropout = nn.Dropout2d(p=dropout)
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False)
 
         if stride != 1 or in_planes != self.expansion*planes:
@@ -31,7 +32,7 @@ class PreActBlock(nn.Module):
         out = F.relu(self.bn1(x))
         shortcut = self.shortcut(out) if hasattr(self, 'shortcut') else x
         out = self.conv1(out)
-        out = self.conv2(F.relu(self.bn2(out)))
+        out = self.conv2(self.dropout(F.relu(self.bn2(out))))
         out += shortcut
         return out
 
@@ -65,9 +66,10 @@ class PreActBottleneck(nn.Module):
 
 
 class PreActResNet(nn.Module):
-    def __init__(self, block, num_blocks, num_classes=10, thickness=64):
+    def __init__(self, block, num_blocks, num_classes=10, thickness=64, dropout=0.):
         super(PreActResNet, self).__init__()
         self.in_planes = thickness
+        self.p = dropout
 
         self.conv1 = nn.Conv2d(3, thickness, kernel_size=3, stride=1, padding=1, bias=False)
         self.layer1 = self._make_layer(block, thickness, num_blocks[0], stride=1)
@@ -76,11 +78,12 @@ class PreActResNet(nn.Module):
         self.layer4 = self._make_layer(block, thickness*8, num_blocks[3], stride=2)
         self.linear = nn.Linear(thickness*8*block.expansion, num_classes)
 
+
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1]*(num_blocks-1)
         layers = []
         for stride in strides:
-            layers.append(block(self.in_planes, planes, stride))
+            layers.append(block(self.in_planes, planes, stride, dropout=self.p))
             self.in_planes = planes * block.expansion
         return nn.Sequential(*layers)
 
@@ -98,8 +101,8 @@ class PreActResNet(nn.Module):
         return out, feat
 
 
-def PreActResNet18(num_classes=10, thickness=64, blocks=[2,2,2,2]):
-    return PreActResNet(PreActBlock, blocks, num_classes=num_classes, thickness=thickness)
+def PreActResNet18(num_classes=10, thickness=64, blocks=[2,2,2,2], dropout=0.):
+    return PreActResNet(PreActBlock, blocks, num_classes=num_classes, thickness=thickness, dropout=dropout)
 
 def PreActResNet34():
     return PreActResNet(PreActBlock, [3,4,6,3])

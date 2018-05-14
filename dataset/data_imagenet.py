@@ -4,7 +4,7 @@ from PIL import Image
 
 import os
 import os.path
-
+import random
 
 def has_file_allowed_extension(filename, extensions):
     """Checks if a file is an allowed extension.
@@ -90,6 +90,8 @@ class DatasetFolder(data.Dataset):
                 samples_reduced = []
                 for a_class in class_list:
                     samples_per_class = [a_sample for a_sample in samples if a_sample[1] == a_class]
+                    random.seed(1234)
+                    random.shuffle(samples_per_class)
                     samples_reduced += samples_per_class[0:int(len(samples_per_class)*data_ratio)]
                 samples = samples_reduced
         else:
