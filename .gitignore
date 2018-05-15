@@ -1,3 +1,5 @@
 figs/*
 results/*
 backup_results_180425/*
+.vscode/*
+.ipynb_checkpoints/*
