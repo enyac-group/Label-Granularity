@@ -156,12 +156,20 @@ if use_cuda:
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
 
+# regime = {
+#     0: {'optimizer': 'SGD', 'lr': 1e-2,
+#         'weight_decay': 1e-4, 'momentum': 0.9},
+#     60: {'lr': 1e-3},
+#     90: {'lr': 1e-4},
+#     120: {'lr': 1e-5},
+# }
 regime = {
     0: {'optimizer': 'SGD', 'lr': 1e-2,
         'weight_decay': 1e-4, 'momentum': 0.9},
-    60: {'lr': 1e-3},
-    90: {'lr': 1e-4},
-    120: {'lr': 1e-5},
+    90: {'lr': 1e-3},
+    135: {'lr': 1e-4},
+    180: {'lr': 1e-5},
+    210: {'lr': 1e-6},
 }
 
 logging.info('training regime: %s', regime)
@@ -281,12 +289,12 @@ def test(epoch, f2c=False, train_f=True):
 #start_epoch = 0
 
 if args.f2c == 1:
-    for epoch in range(start_epoch, 150):
+    for epoch in range(start_epoch, 225):
         train(epoch, f2c=True)
         #test(epoch, f2c=False)
         test(epoch, f2c=True, train_f=False)
 elif args.f2c == 0:
-    for epoch in range(start_epoch, 150):
+    for epoch in range(start_epoch, 225):
         train(epoch, f2c=False)
         test(epoch, f2c=False)
         test(epoch, f2c=True, train_f=True)
