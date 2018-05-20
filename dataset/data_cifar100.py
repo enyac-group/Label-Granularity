@@ -222,7 +222,8 @@ class CIFAR100(data.Dataset):
 
         #return np.asarray(img), index, target
         #print('img: {}, target: {}'.format(img, target))
-        return np.asarray(img), int(target)
+        #return np.asarray(img), int(target)
+        return img, target
 
 
     def __len__(self):
