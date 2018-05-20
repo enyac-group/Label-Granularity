@@ -347,15 +347,14 @@ def test(epoch, f2c=False, train_f=True):
 
 
 if args.f2c == 1:
-    for epoch in range(start_epoch, 200):
+    for epoch in range(start_epoch, int(200//args.data_ratio)):
         train(epoch, f2c=True)
         #test(epoch, f2c=False)
         test(epoch, f2c=True, train_f=False)
 elif args.f2c == 0:
-    for epoch in range(start_epoch, 200):
+    for epoch in range(start_epoch, int(200//args.data_ratio)):
         train(epoch, f2c=False)
         test(epoch, f2c=False)
         test(epoch, f2c=True, train_f=True)
-
 
 # test(0, f2c=True, train_f=True)
