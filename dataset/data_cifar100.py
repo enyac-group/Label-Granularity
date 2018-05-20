@@ -12,6 +12,7 @@ else:
 
 import torch.utils.data as data
 from .data_utils import download_url, check_integrity
+import random
 
 
 class CIFAR100(data.Dataset):
