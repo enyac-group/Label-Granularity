@@ -49,7 +49,7 @@ class CIFAR10(data.Dataset):
 
     def __init__(self, root, train=True,
                  transform=None, target_transform=None,
-                 download=False):
+                 download=False, data_ratio=1.):
         self.root = os.path.expanduser(root)
         self.transform = transform
         self.target_transform = target_transform
@@ -86,12 +86,15 @@ class CIFAR10(data.Dataset):
             self.train_data = self.train_data.transpose((0, 2, 3, 1))  # convert to HWC
             # !!!!! reduce by half !!!!!
             self.train_labels = np.array(self.train_labels)
-            idx_left = np.ones(50000, dtype=bool)
+            idx_left = np.zeros(50000, dtype=bool)
             for i in range(10):
                 idx = np.where(self.train_labels == i)[0]
                 print('class i has {} number of data'.format(idx.shape[0]))
-                idx_left[idx[2500:]] = True
+                random.seed(1234)
+                np.random.shuffle(idx)
+                idx_left[idx[0:int(len(idx)*data_ratio)]] = True
             self.train_data = self.train_data[idx_left]
+            print('reduced training set has {} data'.format(len(self.train_data)))
             self.train_labels = self.train_labels[idx_left]
         else:
             f = self.test_list[0][0]
@@ -139,7 +142,7 @@ class CIFAR10(data.Dataset):
     def __len__(self):
         if self.train:
             #return 50000
-            return 25000
+            return len(self.train_data)
         else:
             return 10000
 
