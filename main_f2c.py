@@ -33,6 +33,8 @@ parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
 parser.add_argument('--resume_dir', default=None, help='resume dir')
 parser.add_argument('--superclass', default=None, help='one of the super class')
 parser.add_argument('--gpus', default='0', help='gpus used')
+parser.add_argument('--f2c', type=int, default=None, help='whether use coarse label')
+parser.add_argument('--data_ratio', type=float, default=1., help='ratio of training data to use')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -70,7 +72,7 @@ transform_test = transforms.Compose([
 ])
 
 #trainset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
-trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
+trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train, data_ratio=args.data_ratio)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
 
 testset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
@@ -84,6 +86,13 @@ for idx,a_class in enumerate(classes):
         classes_f2c[idx] = 0
     elif a_class in ['bird', 'cat', 'deer', 'dog', 'frog', 'horse']:
         classes_f2c[idx] = 1
+
+if args.f2c == 1:
+    NUM_CLASS = 2
+elif args.f2c == 0:
+    NUM_CLASS = len(classes_f2c)
+else:
+    raise ValueError
 
 # #default is 01289
 # classes_f2c = {}
@@ -107,7 +116,7 @@ else:
     print('==> Building model..')
     # net = VGG('VGG8')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=10, thickness=64, blocks=[2,2,2,2])
+    net = PreActResNet18(num_classes=NUM_CLASS, thickness=64, blocks=[2,2,2,2])
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
@@ -145,11 +154,16 @@ optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5
 #     150: {'lr': 1e-2},
 #     250: {'lr': 1e-3}
 # }
+# regime = {
+#     0: {'optimizer': 'SGD', 'lr': 1e-1,
+#         'weight_decay': 5e-4, 'momentum': 0.9},
+#     150: {'lr': 1e-2},
+#     250: {'lr': 1e-3},
+# }
 regime = {
     0: {'optimizer': 'SGD', 'lr': 1e-1,
         'weight_decay': 5e-4, 'momentum': 0.9},
-    150: {'lr': 1e-2},
-    250: {'lr': 1e-3},
+    int(150//args.data_ratio): {'lr': 1e-2},
 }
 # regime = {
 #     0: {'optimizer': 'SGD', 'lr': 1e-4, 'momentum': 0.9},
@@ -163,6 +177,7 @@ def train(epoch, f2c=False):
     net.train()
     train_loss = 0
     correct = 0
+    correct_f2c = 0
     total = 0
     global optimizer
     optimizer = adjust_optimizer(optimizer, epoch, regime)
@@ -184,16 +199,34 @@ def train(epoch, f2c=False):
         total += targets.size(0)
         correct += predicted.eq(targets.data).cpu().sum()
 
+        if f2c == False:
+            predicted_np = predicted.cpu().numpy()
+            for idx,a_predicted in enumerate(predicted_np):
+                predicted_np[idx] = classes_f2c[a_predicted]
+            targets_np = targets.data.cpu().numpy()
+            for idx,a_target in enumerate(targets_np):
+                targets_np[idx] = classes_f2c[a_target]
+            correct_f2c += (predicted_np == targets_np).sum()
+
         #progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
         #    % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
         if batch_idx % 10 == 0:
-            logging.info('\n Epoch: [{0}][{1}/{2}]\t'
-                        'Training Loss {train_loss:.3f} \t'
-                        'Training Prec@1 {train_prec1:.3f} \t'
-                        .format(epoch, batch_idx, len(trainloader),
-                        train_loss=train_loss/(batch_idx+1), 
-                        train_prec1=100.*correct/total))
-
+            if f2c:
+                logging.info('\n Epoch: [{0}][{1}/{2}]\t'
+                            'Training Loss {train_loss:.3f} \t'
+                            'Training Prec@1 {train_prec1:.3f} \t'
+                            .format(epoch, batch_idx, len(trainloader),
+                            train_loss=train_loss/(batch_idx+1), 
+                            train_prec1=100.*correct/total))
+            else:
+                logging.info('\n Epoch: [{0}][{1}/{2}]\t'
+                            'Training Loss {train_loss:.3f} \t'
+                            'Training Prec@1 {train_prec1:.3f} \t'
+                            'Training Prec@1 f2c {train_prec1_f2c:.3f} \t'
+                            .format(epoch, batch_idx, len(trainloader),
+                            train_loss=train_loss/(batch_idx+1), 
+                            train_prec1=100.*correct/total,
+                            train_prec1_f2c=100.*correct_f2c/total))
 
 def test(epoch, f2c=False, train_f=True):
     global best_acc
@@ -249,10 +282,19 @@ def test(epoch, f2c=False, train_f=True):
         best_acc = acc
 
 
-start_epoch = 0
-for epoch in range(start_epoch, start_epoch+200):
-    train(epoch, f2c=False)
-    test(epoch, f2c=False)
-    test(epoch, f2c=True, train_f=True)
+#start_epoch = 0
+
+if args.f2c == 1:
+    for epoch in range(start_epoch, int(200//args.data_ratio)):
+        train(epoch, f2c=True)
+        #test(epoch, f2c=False)
+        test(epoch, f2c=True, train_f=False)
+elif args.f2c == 0:
+    for epoch in range(start_epoch, int(200//args.data_ratio)):
+        train(epoch, f2c=False)
+        test(epoch, f2c=False)
+        test(epoch, f2c=True, train_f=True)
+    
+
 
 # test(0, f2c=True, train_f=True)

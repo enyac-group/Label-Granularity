@@ -84,7 +84,7 @@ class CIFAR10(data.Dataset):
             self.train_data = np.concatenate(self.train_data)
             self.train_data = self.train_data.reshape((50000, 3, 32, 32))
             self.train_data = self.train_data.transpose((0, 2, 3, 1))  # convert to HWC
-            # !!!!! reduce by half !!!!!
+            # !!!!! reduce data !!!!!
             self.train_labels = np.array(self.train_labels)
             idx_left = np.zeros(50000, dtype=bool)
             for i in range(10):

@@ -179,6 +179,20 @@ class CIFAR100(data.Dataset):
             self.test_labels = [label_mapping[a_label] for a_label in self.test_labels]
             print('testing size: {}'.format(len(self.test_data)))
 
+        # !!!!! reduce data !!!!!
+        if self.train and data_ratio < 1.:
+            self.train_labels = np.array(self.train_labels)
+            idx_left = np.zeros(len(self.train_data), dtype=bool)
+            for i in range(len(self.train_labels)):
+                idx = np.where(self.train_labels == i)[0]
+                print('class i has {} number of data'.format(idx.shape[0]))
+                random.seed(1234)
+                np.random.shuffle(idx)
+                idx_left[idx[0:int(len(idx)*data_ratio)]] = True
+            self.train_data = self.train_data[idx_left]
+            print('reduced training set has {} data'.format(len(self.train_data)))
+            self.train_labels = self.train_labels[idx_left]
+
     def __getitem__(self, index):
         """
         Args:
