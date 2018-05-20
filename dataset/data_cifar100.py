@@ -221,6 +221,7 @@ class CIFAR100(data.Dataset):
         #target = self.classes_f2c[target]
 
         #return np.asarray(img), index, target
+        print('img: {}, target: {}'.format(img, target))
         return np.asarray(img), target
 
 
