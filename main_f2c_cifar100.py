@@ -136,7 +136,7 @@ if args.categories == 'animals':
     for super_class in super_class_names:
         fine_class_names += classes_c2f[super_class]
     class_idx = {name:idx for idx,name in enumerate(fine_classes)}
-    classes = [class_idx[name] for name in fine_class_names]
+    class_list = [class_idx[name] for name in fine_class_names]
     classes_f2c = {}
     for idx,a_class in enumerate(classes):
         for jdx,super_class in enumerate(super_class_names):
@@ -156,6 +156,7 @@ elif args.categories == None:
         if idx not in classes_f2c:
             print(idx)
             raise ValueError()
+    class_list = [i for i in range(100)]
     if args.f2c == 1:
         NUM_CLASSES = 20
     else:
@@ -178,11 +179,11 @@ transform_test = transforms.Compose([
 ])
 
 #trainset = torchvision.datasets.CIFAR100(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
-trainset = dataset.data_cifar100.CIFAR100(root='/home/rzding/DATA', train=True, download=True, class_list=classes, transform=transform_train, data_ratio=args.data_ratio)
+trainset = dataset.data_cifar100.CIFAR100(root='/home/rzding/DATA', train=True, download=True, class_list=class_list, transform=transform_train, data_ratio=args.data_ratio)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, num_workers=2)
 
 #testset = torchvision.datasets.CIFAR100(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
-testset = dataset.data_cifar100.CIFAR100(root='/home/rzding/DATA', train=False, download=True, class_list=classes, transform=transform_test, data_ratio=1.)
+testset = dataset.data_cifar100.CIFAR100(root='/home/rzding/DATA', train=False, download=True, class_list=class_list, transform=transform_test, data_ratio=1.)
 testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
 
 
