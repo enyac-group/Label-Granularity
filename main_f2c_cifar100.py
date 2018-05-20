@@ -138,7 +138,7 @@ if args.categories == 'animals':
     class_idx = {name:idx for idx,name in enumerate(fine_classes)}
     class_list = [class_idx[name] for name in fine_class_names]
     classes_f2c = {}
-    for idx,a_class in enumerate(classes):
+    for idx,a_class in enumerate(class_list):
         for jdx,super_class in enumerate(super_class_names):
             if fine_classes[a_class] in classes_c2f[super_class]:
                 classes_f2c[idx] = jdx
