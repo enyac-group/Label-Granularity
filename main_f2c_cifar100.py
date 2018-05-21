@@ -226,9 +226,9 @@ optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5
 regime = {
     0: {'optimizer': 'SGD', 'lr': 1e-1,
         'weight_decay': 5e-4, 'momentum': 0.9, 'nesterov': False},
-    60: {'lr': 2e-2},
-    120: {'lr': 4e-3},
-    160: {'lr': 8e-4}
+    int(60//args.data_ratio): {'lr': 2e-2},
+    int(120//args.data_ratio): {'lr': 4e-3},
+    int(160//args.data_ratio): {'lr': 8e-4},
 }
 logging.info('training regime: %s', regime)
 
