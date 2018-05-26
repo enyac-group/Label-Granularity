@@ -60,10 +60,10 @@ class Wide_ResNet(nn.Module):
         self.layer3 = self._wide_layer(wide_basic, nStages[3], n, dropout_rate, stride=2)
         self.bn1 = nn.BatchNorm2d(nStages[3], momentum=0.9)
         if fine_cls is None:
+            self.linear = nn.Linear(nStages[3], num_classes)
+        else:
             self.linear_extra = nn.Linear(nStages[3], fine_cls)
             self.linear = nn.Linear(fine_cls, num_classes)
-        else:
-            self.linear = nn.Linear(nStages[3], num_classes)
 
     def _wide_layer(self, block, planes, num_blocks, dropout_rate, stride):
         strides = [stride] + [1]*(num_blocks-1)

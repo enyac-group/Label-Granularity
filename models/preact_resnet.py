@@ -77,10 +77,10 @@ class PreActResNet(nn.Module):
         self.layer4 = self._make_layer(block, thickness*8, num_blocks[3], stride=2)
         self.dropout = nn.Dropout(p=dropout)
         if fine_cls is None:
+            self.linear = nn.Linear(thickness*8*block.expansion, num_classes)
+        else:
             self.linear_extra = nn.Linear(thickness*8*block.expansion, fine_cls)
             self.linear = nn.Linear(fine_cls, num_classes)
-        else:
-            self.linear = nn.Linear(thickness*8*block.expansion, num_classes)
 
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1]*(num_blocks-1)
