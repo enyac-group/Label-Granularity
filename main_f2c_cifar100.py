@@ -51,7 +51,7 @@ if not os.path.exists(save_path):
 if args.resume_dir is None:
     setup_logging(os.path.join(save_path, 'log.txt'))
 else:
-    setup_logging(os.path.join(save_path, 'log_eval.txt'))
+    setup_logging(os.path.join(save_path, 'log1.txt'))
 logging.info("saving to %s", save_path)
 logging.info("run arguments: %s", args)
 
@@ -145,8 +145,10 @@ if args.categories == 'animals':
     print('classes_f2c: {}'.format(classes_f2c))
     if args.f2c == 1:
         NUM_CLASSES = 10
+        fine_cls = 50
     else:
         NUM_CLASSES = 50
+        fine_cls = None
 elif args.categories == None:
     classes_f2c = {}
     for idx,f_class in enumerate(fine_classes):
@@ -159,8 +161,10 @@ elif args.categories == None:
     class_list = [i for i in range(100)]
     if args.f2c == 1:
         NUM_CLASSES = 20
+        fine_cls = 100
     else:
         NUM_CLASSES = 100
+        fine_cls = None
 else:
     raise ValueError
 
@@ -201,7 +205,7 @@ else:
     # net = VGG('VGG19')
     # net = ResNet18()
     #net = PreActResNet18(num_classes=100)
-    net = wide_resnet(num_classes=NUM_CLASSES)
+    net = wide_resnet(num_classes=NUM_CLASSES, fine_cls=fine_cls)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()

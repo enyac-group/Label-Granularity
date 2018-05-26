@@ -89,8 +89,10 @@ for idx,a_class in enumerate(classes):
 
 if args.f2c == 1:
     NUM_CLASS = 2
+    fine_cls = len(classes_f2c)
 elif args.f2c == 0:
     NUM_CLASS = len(classes_f2c)
+    fine_cls = None
 else:
     raise ValueError
 
@@ -116,7 +118,7 @@ else:
     print('==> Building model..')
     # net = VGG('VGG8')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=NUM_CLASS, thickness=64, blocks=[2,2,2,2])
+    net = PreActResNet18(num_classes=NUM_CLASS, thickness=64, blocks=[2,2,2,2], fine_cls=fine_cls)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()

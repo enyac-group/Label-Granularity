@@ -65,9 +65,10 @@ class PreActBottleneck(nn.Module):
 
 
 class PreActResNet(nn.Module):
-    def __init__(self, block, num_blocks, num_classes=10, thickness=64, dropout=0.):
+    def __init__(self, block, num_blocks, num_classes=10, thickness=64, dropout=0., fine_cls=None):
         super(PreActResNet, self).__init__()
         self.in_planes = thickness
+        self.fine_cls = fine_cls
 
         self.conv1 = nn.Conv2d(3, thickness, kernel_size=3, stride=1, padding=1, bias=False)
         self.layer1 = self._make_layer(block, thickness, num_blocks[0], stride=1)
@@ -75,8 +76,11 @@ class PreActResNet(nn.Module):
         self.layer3 = self._make_layer(block, thickness*4, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, thickness*8, num_blocks[3], stride=2)
         self.dropout = nn.Dropout(p=dropout)
-        self.linear = nn.Linear(thickness*8*block.expansion, num_classes)
-
+        if fine_cls is None:
+            self.linear_extra = nn.Linear(thickness*8*block.expansion, fine_cls)
+            self.linear = nn.Linear(fine_cls, num_classes)
+        else:
+            self.linear = nn.Linear(thickness*8*block.expansion, num_classes)
 
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1]*(num_blocks-1)
@@ -96,13 +100,15 @@ class PreActResNet(nn.Module):
         out = out.view(out.size(0), -1)
         feat = out
         out = self.dropout(out)
+        if self.fine_cls is not None:
+            out = self.linear_extra(out)
         out = self.linear(out)
         #feat = F.softmax(out)
         return out, feat
 
 
-def PreActResNet18(num_classes=10, thickness=64, blocks=[2,2,2,2], dropout=0.):
-    return PreActResNet(PreActBlock, blocks, num_classes=num_classes, thickness=thickness, dropout=dropout)
+def PreActResNet18(num_classes=10, thickness=64, blocks=[2,2,2,2], dropout=0., fine_cls=None):
+    return PreActResNet(PreActBlock, blocks, num_classes=num_classes, thickness=thickness, dropout=dropout, fine_cls=fine_cls)
 
 def PreActResNet34():
     return PreActResNet(PreActBlock, [3,4,6,3])

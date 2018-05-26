@@ -42,9 +42,10 @@ class wide_basic(nn.Module):
         return out
 
 class Wide_ResNet(nn.Module):
-    def __init__(self, depth, widen_factor, dropout_rate, num_classes):
+    def __init__(self, depth, widen_factor, dropout_rate, num_classes, fine_cls=None):
         super(Wide_ResNet, self).__init__()
         self.in_planes = 16
+        self.fine_cls = fine_cls
 
         assert ((depth-4)%6 ==0), 'Wide-resnet depth should be 6n+4'
         n = (depth-4)//6
@@ -58,7 +59,11 @@ class Wide_ResNet(nn.Module):
         self.layer2 = self._wide_layer(wide_basic, nStages[2], n, dropout_rate, stride=2)
         self.layer3 = self._wide_layer(wide_basic, nStages[3], n, dropout_rate, stride=2)
         self.bn1 = nn.BatchNorm2d(nStages[3], momentum=0.9)
-        self.linear = nn.Linear(nStages[3], num_classes)
+        if fine_cls is None:
+            self.linear_extra = nn.Linear(nStages[3], fine_cls)
+            self.linear = nn.Linear(fine_cls, num_classes)
+        else:
+            self.linear = nn.Linear(nStages[3], num_classes)
 
     def _wide_layer(self, block, planes, num_blocks, dropout_rate, stride):
         strides = [stride] + [1]*(num_blocks-1)
@@ -79,9 +84,13 @@ class Wide_ResNet(nn.Module):
         out = F.avg_pool2d(out, 8)
         out = out.view(out.size(0), -1)
         feat = out
-        out = self.linear(out)
+        if self.fine_cls:
+            out = self.linear_extra(out)
+            out = self.linear(out)
+        else:
+            out = self.linear(out)
 
         return out, feat
 
-def wide_resnet(num_classes=10):
-    return Wide_ResNet(depth=28, widen_factor=10, dropout_rate=0.3, num_classes=num_classes)
+def wide_resnet(num_classes=10, fine_cls=None):
+    return Wide_ResNet(depth=28, widen_factor=10, dropout_rate=0.3, num_classes=num_classes, fine_cls=fine_cls)

@@ -83,8 +83,10 @@ elif args.categories == 'fruit_vege':
 
 if args.f2c == 1:
     NUM_CLASS = 2
+    fine_cls = len(classes_f2c)
 elif args.f2c == 0:
     NUM_CLASS = len(classes_f2c)
+    fine_cls = None
 else:
     raise ValueError
 
@@ -106,7 +108,7 @@ transform_test = transforms.Compose([
 trainset = dataset.data_imagenet.ImageFolder(root=None, train=True, class_list=classes, transform=transform_train, data_ratio=args.data_ratio)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=32, shuffle=True, num_workers=2)
 
-testset = dataset.data_imagenet.ImageFolder(root=None, train=False, class_list=classes, transform=transform_train, data_ratio=1.)
+testset = dataset.data_imagenet.ImageFolder(root=None, train=False, class_list=classes, transform=transform_test, data_ratio=1.)
 testloader = torch.utils.data.DataLoader(testset, batch_size=32, shuffle=False, num_workers=2)
 
 
@@ -123,7 +125,7 @@ else:
     print('==> Building model..')
     # net = VGG('VGG8')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=NUM_CLASS, thickness=16, blocks=[2,2,2,2], dropout=0.)
+    net = PreActResNet18(num_classes=NUM_CLASS, thickness=16, blocks=[2,2,2,2], dropout=0., fine_cls=fine_cls)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
