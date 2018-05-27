@@ -36,6 +36,7 @@ parser.add_argument('--gpus', default='0', help='gpus used')
 parser.add_argument('--f2c', type=int, default=None, help='whether use coarse label')
 parser.add_argument('--categories', default=None, help='which classes to use')
 parser.add_argument('--data_ratio', type=float, default=1., help='ratio of training data to use')
+parser.add_argument('--add_layer', type=int, default=0, help='whether to add additional layer')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -50,7 +51,7 @@ if not os.path.exists(save_path):
 if args.resume_dir is None:
     setup_logging(os.path.join(save_path, 'log.txt'))
 else:
-    setup_logging(os.path.join(save_path, 'log_eval.txt'))
+    setup_logging(os.path.join(save_path, 'log_test.txt'))
 logging.info("saving to %s", save_path)
 logging.info("run arguments: %s", args)
 
@@ -83,12 +84,15 @@ elif args.categories == 'fruit_vege':
 
 if args.f2c == 1:
     NUM_CLASS = 2
-    fine_cls = len(classes_f2c)
 elif args.f2c == 0:
     NUM_CLASS = len(classes_f2c)
-    fine_cls = None
 else:
     raise ValueError
+
+if args.f2c == 1 and args.add_layer == 1:
+    fine_cls = len(classes_f2c)
+else:
+    fine_cls = None
 
 
 transform_train = transforms.Compose([
@@ -234,7 +238,7 @@ def train(epoch, f2c=False):
                             train_prec1_f2c=100.*correct_f2c/total))
 
 
-def test(epoch, f2c=False, train_f=True):
+def test(epoch, f2c=False, train_f=True, loader=testloader):
     global best_acc
     net.eval()
     test_loss = 0
@@ -290,16 +294,27 @@ def test(epoch, f2c=False, train_f=True):
 
 #start_epoch = 0
 
-if args.f2c == 1:
-    for epoch in range(start_epoch, int(225//args.data_ratio)):
-        train(epoch, f2c=True)
-        #test(epoch, f2c=False)
-        test(epoch, f2c=True, train_f=False)
-elif args.f2c == 0:
-    for epoch in range(start_epoch, int(225//args.data_ratio)):
-        train(epoch, f2c=False)
-        test(epoch, f2c=False)
-        test(epoch, f2c=True, train_f=True)
+# if args.f2c == 1:
+#     for epoch in range(start_epoch, int(225//args.data_ratio)):
+#         train(epoch, f2c=True)
+#         test(epoch, f2c=True, train_f=False)
+# elif args.f2c == 0:
+#     for epoch in range(start_epoch, int(225//args.data_ratio)):
+#         train(epoch, f2c=False)
+#         test(epoch, f2c=False)
+#         test(epoch, f2c=True, train_f=True)
     
-
-# test(0, f2c=True, train_f=True)
+if args.f2c == 1:
+    logging.info('Test trainset: ')
+    trainset_test = dataset.data_imagenet.ImageFolder(root=None, train=True, class_list=classes, transform=transform_test, data_ratio=args.data_ratio)
+    trainloader_test = torch.utils.data.DataLoader(trainset_test, batch_size=100, shuffle=False, num_workers=2)
+    test(start_epoch, f2c=True, train_f=False, loader=trainloader_test)
+    logging.info('Test testset: ')
+    test(start_epoch, f2c=True, train_f=False, loader=testloader)
+elif args.f2c == 0:
+    logging.info('Test trainset: ')
+    trainset_test = dataset.data_imagenet.ImageFolder(root=None, train=True, class_list=classes, transform=transform_test, data_ratio=args.data_ratio)
+    trainloader_test = torch.utils.data.DataLoader(trainset_test, batch_size=100, shuffle=False, num_workers=2)
+    test(start_epoch, f2c=True, train_f=True, loader=trainloader_test)
+    logging.info('Test testset: ')
+    test(start_epoch, f2c=True, train_f=True, loader=testloader)
