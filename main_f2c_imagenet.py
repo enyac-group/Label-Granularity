@@ -123,6 +123,8 @@ if args.resume:
     assert os.path.isdir(args.resume_dir)
     checkpoint = torch.load(os.path.join(args.resume_dir, 'ckpt.t7'))
     net = checkpoint['net']
+    if args.add_layer == 0:
+        net.fine_cls = None
     best_acc = checkpoint['acc']
     start_epoch = checkpoint['epoch']
 else:
