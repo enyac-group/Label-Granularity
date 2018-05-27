@@ -240,7 +240,7 @@ def train(epoch, f2c=False):
                             train_prec1_f2c=100.*correct_f2c/total))
 
 
-def test(epoch, f2c=False, train_f=True, loader=testloader):
+def test(epoch, f2c=False, train_f=True, testloader=None):
     global best_acc
     net.eval()
     test_loss = 0
@@ -311,12 +311,15 @@ if args.f2c == 1:
     trainset_test = dataset.data_imagenet.ImageFolder(root=None, train=True, class_list=classes, transform=transform_test, data_ratio=args.data_ratio)
     trainloader_test = torch.utils.data.DataLoader(trainset_test, batch_size=100, shuffle=False, num_workers=2)
     test(start_epoch, f2c=True, train_f=False, loader=trainloader_test)
+
     logging.info('Test testset: ')
     test(start_epoch, f2c=True, train_f=False, loader=testloader)
+
 elif args.f2c == 0:
     logging.info('Test trainset: ')
     trainset_test = dataset.data_imagenet.ImageFolder(root=None, train=True, class_list=classes, transform=transform_test, data_ratio=args.data_ratio)
     trainloader_test = torch.utils.data.DataLoader(trainset_test, batch_size=100, shuffle=False, num_workers=2)
     test(start_epoch, f2c=True, train_f=True, loader=trainloader_test)
+
     logging.info('Test testset: ')
     test(start_epoch, f2c=True, train_f=True, loader=testloader)
