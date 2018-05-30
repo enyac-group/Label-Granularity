@@ -303,7 +303,7 @@ if args.f2c == 1:
 elif args.f2c == 0:
     for epoch in range(start_epoch, int(225//args.data_ratio)):
         train(epoch, f2c=False)
-        test(epoch, f2c=False)
+        test(epoch, f2c=False, testloader=testloader)
         test(epoch, f2c=True, train_f=True, testloader=testloader)
     
 # if args.f2c == 1:
