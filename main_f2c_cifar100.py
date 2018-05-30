@@ -37,6 +37,7 @@ parser.add_argument('--gpus', default='0', help='gpus used')
 parser.add_argument('--f2c', type=int, default=None, help='whether use coarse label')
 parser.add_argument('--categories', default=None, help='which classes to use')
 parser.add_argument('--data_ratio', type=float, default=1., help='ratio of training data to use')
+parser.add_argument('--add_layer', type=int, default=0, help='whether to add additional layer')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -145,7 +146,8 @@ if args.categories == 'animals':
     print('classes_f2c: {}'.format(classes_f2c))
     if args.f2c == 1:
         NUM_CLASSES = 10
-        fine_cls = 50
+        if args.add_layer == 1:
+            fine_cls = 50
     else:
         NUM_CLASSES = 50
         fine_cls = None
@@ -161,7 +163,8 @@ elif args.categories == None:
     class_list = [i for i in range(100)]
     if args.f2c == 1:
         NUM_CLASSES = 20
-        fine_cls = 100
+        if args.add_layer == 1:
+            fine_cls = 100
     else:
         NUM_CLASSES = 100
         fine_cls = None
