@@ -299,12 +299,12 @@ def test(epoch, f2c=False, train_f=True, testloader=None):
 if args.f2c == 1:
     for epoch in range(start_epoch, int(225//args.data_ratio)):
         train(epoch, f2c=True)
-        test(epoch, f2c=True, train_f=False)
+        test(epoch, f2c=True, train_f=False, testloader=testloader)
 elif args.f2c == 0:
     for epoch in range(start_epoch, int(225//args.data_ratio)):
         train(epoch, f2c=False)
         test(epoch, f2c=False)
-        test(epoch, f2c=True, train_f=True)
+        test(epoch, f2c=True, train_f=True, testloader=testloader)
     
 # if args.f2c == 1:
 #     logging.info('Test trainset: ')
