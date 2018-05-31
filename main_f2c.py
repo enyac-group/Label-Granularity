@@ -35,6 +35,7 @@ parser.add_argument('--superclass', default=None, help='one of the super class')
 parser.add_argument('--gpus', default='0', help='gpus used')
 parser.add_argument('--f2c', type=int, default=None, help='whether use coarse label')
 parser.add_argument('--data_ratio', type=float, default=1., help='ratio of training data to use')
+parser.add_argument('--add_layer', type=int, default=0, help='whether to add additional layer')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -89,7 +90,10 @@ for idx,a_class in enumerate(classes):
 
 if args.f2c == 1:
     NUM_CLASS = 2
-    fine_cls = len(classes_f2c)
+    if args.add_layer == 1:
+        fine_cls = len(classes_f2c)
+    else:
+        fine_cls = None
 elif args.f2c == 0:
     NUM_CLASS = len(classes_f2c)
     fine_cls = None

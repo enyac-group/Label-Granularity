@@ -148,6 +148,8 @@ if args.categories == 'animals':
         NUM_CLASSES = 10
         if args.add_layer == 1:
             fine_cls = 50
+        else:
+            fine_cls = None
     else:
         NUM_CLASSES = 50
         fine_cls = None
@@ -165,6 +167,8 @@ elif args.categories == None:
         NUM_CLASSES = 20
         if args.add_layer == 1:
             fine_cls = 100
+        else:
+            fine_cls = None
     else:
         NUM_CLASSES = 100
         fine_cls = None
