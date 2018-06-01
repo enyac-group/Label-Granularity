@@ -153,6 +153,53 @@ if args.categories == 'animals':
     else:
         NUM_CLASSES = 50
         fine_cls = None
+elif args.categories == '5_classes':
+    super_class_names = ['aquatic_mammals', 'large_carnivores', 'large_omnivores_and_herbivores', 'medium_mammals', 
+                        'small_mammals']
+    fine_class_names = []
+    for super_class in super_class_names:
+        fine_class_names += classes_c2f[super_class]
+    class_idx = {name:idx for idx,name in enumerate(fine_classes)}
+    class_list = [class_idx[name] for name in fine_class_names]
+    classes_f2c = {}
+    for idx,a_class in enumerate(class_list):
+        for jdx,super_class in enumerate(super_class_names):
+            if fine_classes[a_class] in classes_c2f[super_class]:
+                classes_f2c[idx] = jdx
+    print('classes_f2c: {}'.format(classes_f2c))
+    if args.f2c == 1:
+        NUM_CLASSES = 5
+        if args.add_layer == 1:
+            fine_cls = 25
+        else:
+            fine_cls = None
+    else:
+        NUM_CLASSES = 25
+        fine_cls = None
+elif args.categories == '15_classes':
+    super_class_names = ['aquatic_mammals', 'fish', 'insects', 'large_carnivores', 'large_omnivores_and_herbivores', 'medium_mammals', 
+                        'non-insect_invertebrates', 'people', 'reptiles', 'small_mammals', 'flowers', 'fruit_and_vegetables', 
+                        'trees', 'vehicles_1', 'vehicles_2']
+    fine_class_names = []
+    for super_class in super_class_names:
+        fine_class_names += classes_c2f[super_class]
+    class_idx = {name:idx for idx,name in enumerate(fine_classes)}
+    class_list = [class_idx[name] for name in fine_class_names]
+    classes_f2c = {}
+    for idx,a_class in enumerate(class_list):
+        for jdx,super_class in enumerate(super_class_names):
+            if fine_classes[a_class] in classes_c2f[super_class]:
+                classes_f2c[idx] = jdx
+    print('classes_f2c: {}'.format(classes_f2c))
+    if args.f2c == 1:
+        NUM_CLASSES = 15
+        if args.add_layer == 1:
+            fine_cls = 75
+        else:
+            fine_cls = None
+    else:
+        NUM_CLASSES = 75
+        fine_cls = None
 elif args.categories == None:
     classes_f2c = {}
     for idx,f_class in enumerate(fine_classes):
