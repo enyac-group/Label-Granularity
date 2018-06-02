@@ -38,6 +38,7 @@ parser.add_argument('--f2c', type=int, default=None, help='whether use coarse la
 parser.add_argument('--categories', default=None, help='which classes to use')
 parser.add_argument('--data_ratio', type=float, default=1., help='ratio of training data to use')
 parser.add_argument('--add_layer', type=int, default=0, help='whether to add additional layer')
+parser.add_argument('--dropout', type=float, default=.3, help='dropout rates, default 0.3')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -259,7 +260,7 @@ else:
     # net = VGG('VGG19')
     # net = ResNet18()
     #net = PreActResNet18(num_classes=100)
-    net = wide_resnet(num_classes=NUM_CLASSES, fine_cls=fine_cls)
+    net = wide_resnet(num_classes=NUM_CLASSES, fine_cls=fine_cls, dropout_rate=args.dropout)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()

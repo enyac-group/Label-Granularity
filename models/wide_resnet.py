@@ -92,5 +92,5 @@ class Wide_ResNet(nn.Module):
 
         return out, feat
 
-def wide_resnet(num_classes=10, fine_cls=None):
-    return Wide_ResNet(depth=28, widen_factor=10, dropout_rate=0.3, num_classes=num_classes, fine_cls=fine_cls)
+def wide_resnet(num_classes=10, fine_cls=None, dropout_rate=0.3):
+    return Wide_ResNet(depth=28, widen_factor=10, dropout_rate=dropout_rate, num_classes=num_classes, fine_cls=fine_cls)
