@@ -90,14 +90,14 @@ elif args.f2c == 0:
 else:
     raise ValueError
 
-# #default is 01289
-# classes_f2c = {}
-# for i in range(len(classes)):
-#     if str(i) in args.superclass:
-#         classes_f2c[i] = 0
-#     else:
-#         classes_f2c[i] = 1
-# logging.info("classes_f2c: {}".format(classes_f2c))
+#default is 01289
+classes_f2c = {}
+for i in range(len(classes)):
+    if str(i) in args.superclass:
+        classes_f2c[i] = 0
+    else:
+        classes_f2c[i] = 1
+logging.info("classes_f2c: {}".format(classes_f2c))
 
 
 # Data
@@ -303,30 +303,30 @@ def test(epoch, f2c=False, train_f=True):
 
 # #start_epoch = 0
 
-if args.f2c == 1:
-    for epoch in range(start_epoch, int(200//args.data_ratio)):
-        train(epoch, f2c=True)
-        #test(epoch, f2c=False)
-        test(epoch, f2c=True, train_f=False)
-elif args.f2c == 0:
-    for epoch in range(start_epoch, int(200//args.data_ratio)):
-        train(epoch, f2c=False)
-        test(epoch, f2c=False)
-        test(epoch, f2c=True, train_f=True)
+# if args.f2c == 1:
+#     for epoch in range(start_epoch, int(200//args.data_ratio)):
+#         train(epoch, f2c=True)
+#         #test(epoch, f2c=False)
+#         test(epoch, f2c=True, train_f=False)
+# elif args.f2c == 0:
+#     for epoch in range(start_epoch, int(200//args.data_ratio)):
+#         train(epoch, f2c=False)
+#         test(epoch, f2c=False)
+#         test(epoch, f2c=True, train_f=True)
     
 
 
-# trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train, data_ratio=args.data_ratio)
-# trainloader = torch.utils.data.DataLoader(trainset, batch_size=500, shuffle=False, num_workers=2)
+trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train, data_ratio=args.data_ratio)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=500, shuffle=False, num_workers=2)
 
-# testset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
-# testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False, num_workers=2)
+testset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
+testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False, num_workers=2)
 
-# inter_confusion, intra_confusion = confusion(net, trainloader, classes_f2c)
-# logging.info('Trainset inter_confusion: {}'.format(inter_confusion))
-# logging.info('Trainset intra_confusion: {}'.format(intra_confusion))
-# logging.info('Trainset ACR: {}'.format(inter_confusion/intra_confusion))
-# inter_confusion, intra_confusion = confusion(net, testloader, classes_f2c)
-# logging.info('Testset inter_confusion: {}'.format(inter_confusion))
-# logging.info('Testset intra_confusion: {}'.format(intra_confusion))
-# logging.info('Testset ACR: {}'.format(inter_confusion/intra_confusion))
+inter_confusion, intra_confusion = confusion(net, trainloader, classes_f2c)
+logging.info('Trainset inter_confusion: {}'.format(inter_confusion))
+logging.info('Trainset intra_confusion: {}'.format(intra_confusion))
+logging.info('Trainset ACR: {}'.format(inter_confusion/intra_confusion))
+inter_confusion, intra_confusion = confusion(net, testloader, classes_f2c)
+logging.info('Testset inter_confusion: {}'.format(inter_confusion))
+logging.info('Testset intra_confusion: {}'.format(intra_confusion))
+logging.info('Testset ACR: {}'.format(inter_confusion/intra_confusion))
