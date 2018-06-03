@@ -100,6 +100,7 @@ class CIFAR10(data.Dataset):
                 print('reduced training set has {} data'.format(len(self.train_data)))
                 self.train_labels = self.train_labels[idx_left]
             # !!!!! randomly swap labels within super class !!!!!
+            pickle.dump(self.train_labels, open('train_labels.pkl', 'wb'))
             if randomness > 0.:
                 num_c_classes = max([classes_f2c[f] for f in classes_f2c])+1
                 idx_dict = {i:[j for j in range(len(self.train_labels)) 
