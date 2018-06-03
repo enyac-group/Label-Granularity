@@ -116,7 +116,6 @@ transform_test = transforms.Compose([
 
 #trainset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train)
 trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train, data_ratio=args.data_ratio, randomness=args.randomness, classes_f2c=classes_f2c)
-trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train, data_ratio=1., randomness=0.001, classes_f2c=classes_f2c)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
 
 testset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
@@ -304,23 +303,23 @@ def test(epoch, f2c=False, train_f=True):
 
 # #start_epoch = 0
 
-# if args.f2c == 1:
-#     for epoch in range(start_epoch, int(200//args.data_ratio)):
-#         train(epoch, f2c=True)
-#         #test(epoch, f2c=False)
-#         test(epoch, f2c=True, train_f=False)
-# elif args.f2c == 0:
-#     for epoch in range(start_epoch, int(200//args.data_ratio)):
-#         train(epoch, f2c=False)
-#         test(epoch, f2c=False)
-#         test(epoch, f2c=True, train_f=True)
+if args.f2c == 1:
+    for epoch in range(start_epoch, int(200//args.data_ratio)):
+        train(epoch, f2c=True)
+        #test(epoch, f2c=False)
+        test(epoch, f2c=True, train_f=False)
+elif args.f2c == 0:
+    for epoch in range(start_epoch, int(200//args.data_ratio)):
+        train(epoch, f2c=False)
+        test(epoch, f2c=False)
+        test(epoch, f2c=True, train_f=True)
     
 
 
 # trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train, data_ratio=args.data_ratio)
 # trainloader = torch.utils.data.DataLoader(trainset, batch_size=500, shuffle=False, num_workers=2)
 
-testset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test, randomness=args.randomness, classes_f2c=classes_f2c)
+testset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False, num_workers=2)
 
 # inter_confusion, intra_confusion = confusion(net, trainloader, classes_f2c)
