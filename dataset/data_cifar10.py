@@ -102,7 +102,7 @@ class CIFAR10(data.Dataset):
             # !!!!! randomly swap labels within super class !!!!!
             if randomness > 0.:
                 num_c_classes = max([classes_f2c[f] for f in classes_f2c])+1
-                idx_dict = {i:[for j in range(len(self.train_labels)) 
+                idx_dict = {i:[j for j in range(len(self.train_labels)) 
                         if classes_f2c[self.train_labels[j]] == i] for i in range(num_c_classes)}
                 random.seed(1234)
                 cnt = 0
