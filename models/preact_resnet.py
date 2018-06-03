@@ -100,8 +100,9 @@ class PreActResNet(nn.Module):
         out = out.view(out.size(0), -1)
         feat = out
         out = self.dropout(out)
-        if self.fine_cls is not None:
-            out = self.linear_extra(out)
+        if hasattr(self, 'fine_cls'):
+            if self.fine_cls is not None:
+                out = self.linear_extra(out)
         out = self.linear(out)
         #feat = F.softmax(out)
         return out, feat

@@ -84,9 +84,10 @@ class Wide_ResNet(nn.Module):
         out = F.avg_pool2d(out, 8)
         out = out.view(out.size(0), -1)
         feat = out
-        if self.fine_cls:
-            out = self.linear_extra(out)
-            out = self.linear(out)
+        if hasattr(self, 'fine_cls'):
+            if self.fine_cls:
+                out = self.linear_extra(out)
+                out = self.linear(out)
         else:
             out = self.linear(out)
 
