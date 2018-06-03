@@ -409,28 +409,28 @@ def test(epoch, f2c=False, train_f=True):
 
 
 
-# if args.f2c == 1:
-#     for epoch in range(start_epoch, int(200//args.data_ratio)):
-#         train(epoch, f2c=True)
-#         #test(epoch, f2c=False)
-#         test(epoch, f2c=True, train_f=False)
-# elif args.f2c == 0:
-#     for epoch in range(start_epoch, int(200//args.data_ratio)):
-#         train(epoch, f2c=False)
-#         test(epoch, f2c=False)
-#         test(epoch, f2c=True, train_f=True)
+if args.f2c == 1:
+    for epoch in range(start_epoch, int(200//args.data_ratio)):
+        train(epoch, f2c=True)
+        #test(epoch, f2c=False)
+        test(epoch, f2c=True, train_f=False)
+elif args.f2c == 0:
+    for epoch in range(start_epoch, int(200//args.data_ratio)):
+        train(epoch, f2c=False)
+        test(epoch, f2c=False)
+        test(epoch, f2c=True, train_f=True)
 
-trainset = dataset.data_cifar100.CIFAR100(root='/home/rzding/DATA', train=True, download=True, class_list=class_list, transform=transform_train, data_ratio=args.data_ratio)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=True, num_workers=2)
+# trainset = dataset.data_cifar100.CIFAR100(root='/home/rzding/DATA', train=True, download=True, class_list=class_list, transform=transform_train, data_ratio=args.data_ratio)
+# trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=True, num_workers=2)
 
-testset = dataset.data_cifar100.CIFAR100(root='/home/rzding/DATA', train=False, download=True, class_list=class_list, transform=transform_test, data_ratio=1.)
-testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
+# testset = dataset.data_cifar100.CIFAR100(root='/home/rzding/DATA', train=False, download=True, class_list=class_list, transform=transform_test, data_ratio=1.)
+# testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
 
-inter_confusion, intra_confusion = confusion(net, trainloader, classes_f2c)
-logging.info('Trainset inter_confusion: {}'.format(inter_confusion))
-logging.info('Trainset intra_confusion: {}'.format(intra_confusion))
-logging.info('Trainset ACR: {}'.format(inter_confusion/intra_confusion))
-inter_confusion, intra_confusion = confusion(net, testloader, classes_f2c)
-logging.info('Testset inter_confusion: {}'.format(inter_confusion))
-logging.info('Testset intra_confusion: {}'.format(intra_confusion))
-logging.info('Testset ACR: {}'.format(inter_confusion/intra_confusion))
+# inter_confusion, intra_confusion = confusion(net, trainloader, classes_f2c)
+# logging.info('Trainset inter_confusion: {}'.format(inter_confusion))
+# logging.info('Trainset intra_confusion: {}'.format(intra_confusion))
+# logging.info('Trainset ACR: {}'.format(inter_confusion/intra_confusion))
+# inter_confusion, intra_confusion = confusion(net, testloader, classes_f2c)
+# logging.info('Testset inter_confusion: {}'.format(inter_confusion))
+# logging.info('Testset intra_confusion: {}'.format(intra_confusion))
+# logging.info('Testset ACR: {}'.format(inter_confusion/intra_confusion))
