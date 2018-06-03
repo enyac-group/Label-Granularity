@@ -105,14 +105,14 @@ class CIFAR10(data.Dataset):
                 num_c_classes = max([classes_f2c[f] for f in classes_f2c])+1
                 idx_dict = {i:[j for j in range(len(self.train_labels)) 
                         if classes_f2c[self.train_labels[j]] == i] for i in range(num_c_classes)}
-                print('idx_dict: {}'.format(idx_dict))
+                #print('idx_dict: {}'.format(idx_dict))
                 random.seed(1234)
                 cnt = 0
                 for i in range(len(self.train_labels)):
                     if random.random() < randomness:
                         cnt += 1
                         pool = idx_dict[classes_f2c[self.train_labels[i]]]
-                        swap = random.randint(0,len(pool)-1)
+                        swap = pool[random.randint(0,len(pool)-1)]
                         self.train_labels[i], self.train_labels[swap] = self.train_labels[swap], self.train_labels[i]
                         print('swapped {} and {} with label {} and {}'.format(i,swap,self.train_labels[i],self.train_labels[swap]))
                 print('swapped {} data labels'.format(cnt))
