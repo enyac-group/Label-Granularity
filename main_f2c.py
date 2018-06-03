@@ -316,16 +316,16 @@ def test(epoch, f2c=False, train_f=True):
     
 
 
-trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train, data_ratio=args.data_ratio)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=500, shuffle=False, num_workers=2)
+# trainset = dataset.data_cifar10.CIFAR10(root='/home/rzding/DATA', train=True, download=True, transform=transform_train, data_ratio=args.data_ratio)
+# trainloader = torch.utils.data.DataLoader(trainset, batch_size=500, shuffle=False, num_workers=2)
 
 testset = torchvision.datasets.CIFAR10(root='/home/rzding/DATA', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=500, shuffle=False, num_workers=2)
 
-inter_confusion, intra_confusion = confusion(net, trainloader, classes_f2c)
-logging.info('Trainset inter_confusion: {}'.format(inter_confusion))
-logging.info('Trainset intra_confusion: {}'.format(intra_confusion))
-logging.info('Trainset ACR: {}'.format(inter_confusion/intra_confusion))
+# inter_confusion, intra_confusion = confusion(net, trainloader, classes_f2c)
+# logging.info('Trainset inter_confusion: {}'.format(inter_confusion))
+# logging.info('Trainset intra_confusion: {}'.format(intra_confusion))
+# logging.info('Trainset ACR: {}'.format(inter_confusion/intra_confusion))
 inter_confusion, intra_confusion = confusion(net, testloader, classes_f2c)
 logging.info('Testset inter_confusion: {}'.format(inter_confusion))
 logging.info('Testset intra_confusion: {}'.format(intra_confusion))
