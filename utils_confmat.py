@@ -68,6 +68,7 @@ def confusion(net, loader, classes_f2c):
     print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
     num_coarse_classes = max([c for f,c in enumerate(classes_f2c)])
     group = [[f for f,c in enumerate(classes_f2c) if c == c_cls] for c_cls in range(num_coarse_classes)]
+    print('group: {}'.format(group))
     inter_confusion = inter_conf(conf_matrix_nrm, group=group)
     intra_confusion = intra_conf(conf_matrix_nrm, group=group)
     return inter_confusion, intra_confusion
