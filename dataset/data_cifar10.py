@@ -50,11 +50,12 @@ class CIFAR10(data.Dataset):
 
     def __init__(self, root, train=True,
                  transform=None, target_transform=None,
-                 download=False, data_ratio=1.):
+                 download=False, data_ratio=1., randomness=0., classes_f2c=None):
         self.root = os.path.expanduser(root)
         self.transform = transform
         self.target_transform = target_transform
         self.train = train  # training set or test set
+        self.randomness = randomness
 
         if download:
             self.download()
@@ -98,6 +99,20 @@ class CIFAR10(data.Dataset):
                 self.train_data = self.train_data[idx_left]
                 print('reduced training set has {} data'.format(len(self.train_data)))
                 self.train_labels = self.train_labels[idx_left]
+            # !!!!! randomly swap labels within super class !!!!!
+            if randomness > 0.:
+                num_c_classes = max([classes_f2c[f] for f in classes_f2c])+1
+                idx_dict = {i:[for j in range(len(self.train_labels)) 
+                        if classes_f2c[self.train_labels[j]] == i] for i in range(num_c_classes)}
+                random.seed(1234)
+                cnt = 0
+                for i in range(len(self.train_labels)):
+                    if random.random() < randomness:
+                        cnt += 1
+                        pool = idx_dict[classes_f2c[self.train_labels[i]]]
+                        swap = random.randint(0,len(pool)-1)
+                        self.train_labels[i], self.train_labels[swap] = self.train_labels[swap], self.train_labels[i]
+                print('swapped {} data labels'.format(cnt))
         else:
             f = self.test_list[0][0]
             file = os.path.join(root, self.base_folder, f)
