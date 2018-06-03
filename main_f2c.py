@@ -19,7 +19,7 @@ import argparse
 
 from models import *
 from utils import progress_bar, adjust_optimizer, setup_logging
-from utils_confmat import *
+
 from torch.autograd import Variable
 from datetime import datetime
 import logging
@@ -40,6 +40,9 @@ parser.add_argument('--add_layer', type=int, default=0, help='whether to add add
 parser.add_argument('--dropout', type=float, default=0., help='dropout rates, default 0.3')
 parser.add_argument('--test_confmat', type=int, default=0, help='whether to test confmat')
 args = parser.parse_args()
+
+if args.test_confmat == 1:
+    from utils_confmat import *
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 if args.resume_dir is None:
