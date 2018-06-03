@@ -113,6 +113,7 @@ class CIFAR10(data.Dataset):
                         pool = idx_dict[classes_f2c[self.train_labels[i]]]
                         swap = random.randint(0,len(pool)-1)
                         self.train_labels[i], self.train_labels[swap] = self.train_labels[swap], self.train_labels[i]
+                        print('swapped {} and {} with label {} and {}'.format(i,swap,self.train_labels[i],self.train_labels[swap]))
                 print('swapped {} data labels'.format(cnt))
         else:
             f = self.test_list[0][0]
