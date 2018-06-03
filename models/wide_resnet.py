@@ -87,9 +87,7 @@ class Wide_ResNet(nn.Module):
         if hasattr(self, 'fine_cls'):
             if self.fine_cls:
                 out = self.linear_extra(out)
-                out = self.linear(out)
-        else:
-            out = self.linear(out)
+        out = self.linear(out)
 
         return out, feat
 
