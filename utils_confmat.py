@@ -43,11 +43,43 @@ def conf_matrix(net, loader, num_classes=10):
 
     return cls_as
 
+# def inter_conf(conf_mat, group):
+#     conf_list = []
+#     for i in range(len(conf_mat)):
+#         for j in range(i+1, len(conf_mat[i])):
+#             if not ([i,j] in group or [j,i] in group):
+#                 conf_list.append(conf_mat[i,j])
+#     print('there are {} class pairs not in the same group'.format(len(conf_list)))
+#     return sum(conf_list) / len(conf_list)
+
+# def intra_conf(conf_mat, group):
+#     conf_list = []
+#     for i in range(len(conf_mat)):
+#         for j in range(i+1, len(conf_mat[i])):
+#             if ([i,j] in group or [j,i] in group):
+#                 conf_list.append(conf_mat[i,j])
+#     print('there are {} class pairs in the same group'.format(len(conf_list)))
+#     return sum(conf_list) / len(conf_list)
+
+# def confusion(net, loader, classes_f2c):
+#     matrix = conf_matrix(net, loader, num_classes=len(classes_f2c))
+#     conf_matrix_nrm = matrix / matrix.sum(axis=0)
+#     conf_matrix_nrm = (conf_matrix_nrm + np.transpose(conf_matrix_nrm)) / 2.
+#     print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
+#     num_coarse_classes = max([classes_f2c[f] for f in classes_f2c]) + 1
+#     print('classes_f2c: {}'.format(classes_f2c))
+#     print('num_coarse_classes: {}'.format(num_coarse_classes))
+#     group = [[f for f in classes_f2c if classes_f2c[f] == c_cls] for c_cls in range(num_coarse_classes)]
+#     print('group: {}'.format(group))
+#     inter_confusion = inter_conf(conf_matrix_nrm, group=group)
+#     intra_confusion = intra_conf(conf_matrix_nrm, group=group)
+#     return inter_confusion, intra_confusion
+
 def inter_conf(conf_mat, group):
     conf_list = []
     for i in range(len(conf_mat)):
         for j in range(i+1, len(conf_mat[i])):
-            if not ([i,j] in group or [j,i] in group):
+            if group[i] != group[j]:
                 conf_list.append(conf_mat[i,j])
     print('there are {} class pairs not in the same group'.format(len(conf_list)))
     return sum(conf_list) / len(conf_list)
@@ -56,7 +88,7 @@ def intra_conf(conf_mat, group):
     conf_list = []
     for i in range(len(conf_mat)):
         for j in range(i+1, len(conf_mat[i])):
-            if ([i,j] in group or [j,i] in group):
+            if group[i] == group[j]:
                 conf_list.append(conf_mat[i,j])
     print('there are {} class pairs in the same group'.format(len(conf_list)))
     return sum(conf_list) / len(conf_list)
@@ -66,11 +98,6 @@ def confusion(net, loader, classes_f2c):
     conf_matrix_nrm = matrix / matrix.sum(axis=0)
     conf_matrix_nrm = (conf_matrix_nrm + np.transpose(conf_matrix_nrm)) / 2.
     print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
-    num_coarse_classes = max([classes_f2c[f] for f in classes_f2c]) + 1
-    print('classes_f2c: {}'.format(classes_f2c))
-    print('num_coarse_classes: {}'.format(num_coarse_classes))
-    group = [[f for f in classes_f2c if classes_f2c[f] == c_cls] for c_cls in range(num_coarse_classes)]
-    print('group: {}'.format(group))
-    inter_confusion = inter_conf(conf_matrix_nrm, group=group)
-    intra_confusion = intra_conf(conf_matrix_nrm, group=group)
+    inter_confusion = inter_conf(conf_matrix_nrm, group=classes_f2c)
+    intra_confusion = intra_conf(conf_matrix_nrm, group=classes_f2c)
     return inter_confusion, intra_confusion
