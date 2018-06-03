@@ -48,8 +48,8 @@ class Wide_ResNet(nn.Module):
         self.fine_cls = fine_cls
 
         assert ((depth-4)%6 ==0), 'Wide-resnet depth should be 6n+4'
-        n = (depth-4)//6
-        k = widen_factor
+        n = (depth-4)//6 # 4
+        k = widen_factor # 10
 
         print('| Wide-Resnet %dx%d' %(depth, k))
         nStages = [16, 16*k, 32*k, 64*k]

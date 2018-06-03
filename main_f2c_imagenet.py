@@ -19,6 +19,7 @@ import argparse
 
 from models import *
 from utils import progress_bar, adjust_optimizer, setup_logging
+from utils_confmat import *
 from torch.autograd import Variable
 from datetime import datetime
 import logging
@@ -37,6 +38,7 @@ parser.add_argument('--f2c', type=int, default=None, help='whether use coarse la
 parser.add_argument('--categories', default=None, help='which classes to use')
 parser.add_argument('--data_ratio', type=float, default=1., help='ratio of training data to use')
 parser.add_argument('--add_layer', type=int, default=0, help='whether to add additional layer')
+parser.add_argument('--test_confmat', type=int, default=0, help='whether to test confmat')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -296,15 +298,15 @@ def test(epoch, f2c=False, train_f=True, testloader=None):
 
 #start_epoch = 0
 
-if args.f2c == 1:
-    for epoch in range(start_epoch, int(225//args.data_ratio)):
-        train(epoch, f2c=True)
-        test(epoch, f2c=True, train_f=False, testloader=testloader)
-elif args.f2c == 0:
-    for epoch in range(start_epoch, int(225//args.data_ratio)):
-        train(epoch, f2c=False)
-        test(epoch, f2c=False, testloader=testloader)
-        test(epoch, f2c=True, train_f=True, testloader=testloader)
+# if args.f2c == 1:
+#     for epoch in range(start_epoch, int(225//args.data_ratio)):
+#         train(epoch, f2c=True)
+#         test(epoch, f2c=True, train_f=False, testloader=testloader)
+# elif args.f2c == 0:
+#     for epoch in range(start_epoch, int(225//args.data_ratio)):
+#         train(epoch, f2c=False)
+#         test(epoch, f2c=False, testloader=testloader)
+#         test(epoch, f2c=True, train_f=True, testloader=testloader)
     
 # if args.f2c == 1:
 #     logging.info('Test trainset: ')
@@ -323,3 +325,27 @@ elif args.f2c == 0:
 
 #     logging.info('Test testset: ')
 #     test(start_epoch, f2c=True, train_f=True, testloader=testloader)
+
+
+
+trainset = dataset.data_imagenet.ImageFolder(root=None, train=True, class_list=classes, transform=transform_train, data_ratio=args.data_ratio)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=True, num_workers=2)
+
+testset = dataset.data_imagenet.ImageFolder(root=None, train=False, class_list=classes, transform=transform_train, data_ratio=1.)
+testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
+
+inter_confusion, intra_confusion = confusion(net, trainloader, classes_f2c)
+logging.info('Trainset inter_confusion: {}'.format(inter_confusion))
+logging.info('Trainset intra_confusion: {}'.format(intra_confusion))
+logging.info('Trainset ACR: {}'.format(inter_confusion/intra_confusion))
+inter_confusion_list = []
+intra_confusion_list = []
+for i in range(5):
+    inter_confusion, intra_confusion = confusion(net, testloader, classes_f2c)
+    inter_confusion_list.append(inter_confusion)
+    intra_confusion_list.append(intra_confusion)
+    logging.info('Test {}'.format(i))
+    logging.info('Testset inter_confusion: {}'.format(inter_confusion))
+    logging.info('Testset intra_confusion: {}'.format(intra_confusion))
+    logging.info('Testset ACR: {}'.format(inter_confusion/intra_confusion))
+logging.info('Testset mean ACR: {}'.format(sum(inter_confusion_list)/sum(intra_confusion_list)))

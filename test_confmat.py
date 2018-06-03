@@ -177,5 +177,5 @@ def intra_conf(conf_mat, group):
 
 coarse_conf = inter_conf(conf_matrix_nrm, [[i,i+1] for i in range(0,20,2)])
 fine_conf = intra_conf(conf_matrix_nrm, [[i,i+1] for i in range(0,20,2)])
-print('coarse ACR: {}'.format(coarse_conf))
-print('fine ACR: {}'.format(fine_conf))
+logging.info('coarse ACR: {}'.format(coarse_conf))
+logging.info('fine ACR: {}'.format(fine_conf))

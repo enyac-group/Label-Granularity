@@ -19,6 +19,7 @@ import argparse
 
 from models import *
 from utils import progress_bar, adjust_optimizer, setup_logging
+from utils_confmat import *
 from torch.autograd import Variable
 from datetime import datetime
 import logging
@@ -39,6 +40,7 @@ parser.add_argument('--categories', default=None, help='which classes to use')
 parser.add_argument('--data_ratio', type=float, default=1., help='ratio of training data to use')
 parser.add_argument('--add_layer', type=int, default=0, help='whether to add additional layer')
 parser.add_argument('--dropout', type=float, default=.3, help='dropout rates, default 0.3')
+parser.add_argument('--test_confmat', type=int, default=0, help='whether to test confmat')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -52,6 +54,8 @@ if not os.path.exists(save_path):
     os.makedirs(save_path)
 if args.resume_dir is None:
     setup_logging(os.path.join(save_path, 'log.txt'))
+elif args.test_confmat == 1:
+    setup_logging(os.path.join(save_path, 'log_confmat.txt'))
 else:
     setup_logging(os.path.join(save_path, 'log1.txt'))
 logging.info("saving to %s", save_path)
@@ -405,15 +409,28 @@ def test(epoch, f2c=False, train_f=True):
 
 
 
-if args.f2c == 1:
-    for epoch in range(start_epoch, int(200//args.data_ratio)):
-        train(epoch, f2c=True)
-        #test(epoch, f2c=False)
-        test(epoch, f2c=True, train_f=False)
-elif args.f2c == 0:
-    for epoch in range(start_epoch, int(200//args.data_ratio)):
-        train(epoch, f2c=False)
-        test(epoch, f2c=False)
-        test(epoch, f2c=True, train_f=True)
+# if args.f2c == 1:
+#     for epoch in range(start_epoch, int(200//args.data_ratio)):
+#         train(epoch, f2c=True)
+#         #test(epoch, f2c=False)
+#         test(epoch, f2c=True, train_f=False)
+# elif args.f2c == 0:
+#     for epoch in range(start_epoch, int(200//args.data_ratio)):
+#         train(epoch, f2c=False)
+#         test(epoch, f2c=False)
+#         test(epoch, f2c=True, train_f=True)
 
-# test(0, f2c=True, train_f=True)
+trainset = dataset.data_cifar100.CIFAR100(root='/home/rzding/DATA', train=True, download=True, class_list=class_list, transform=transform_train, data_ratio=args.data_ratio)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=True, num_workers=2)
+
+testset = dataset.data_cifar100.CIFAR100(root='/home/rzding/DATA', train=False, download=True, class_list=class_list, transform=transform_test, data_ratio=1.)
+testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
+
+inter_confusion, intra_confusion = confusion(net, trainloader, classes_f2c)
+logging.info('Trainset inter_confusion: {}'.format(inter_confusion))
+logging.info('Trainset intra_confusion: {}'.format(intra_confusion))
+logging.info('Trainset ACR: {}'.format(inter_confusion/intra_confusion))
+inter_confusion, intra_confusion = confusion(net, testloader, classes_f2c)
+logging.info('Testset inter_confusion: {}'.format(inter_confusion))
+logging.info('Testset intra_confusion: {}'.format(intra_confusion))
+logging.info('Testset ACR: {}'.format(inter_confusion/intra_confusion))
