@@ -90,14 +90,14 @@ elif args.f2c == 0:
 else:
     raise ValueError
 
-#default is 01289
-classes_f2c = {}
-for i in range(len(classes)):
-    if str(i) in args.superclass:
-        classes_f2c[i] = 0
-    else:
-        classes_f2c[i] = 1
-logging.info("classes_f2c: {}".format(classes_f2c))
+# #default is 01289
+# classes_f2c = {}
+# for i in range(len(classes)):
+#     if str(i) in args.superclass:
+#         classes_f2c[i] = 0
+#     else:
+#         classes_f2c[i] = 1
+# logging.info("classes_f2c: {}".format(classes_f2c))
 
 
 # Data
