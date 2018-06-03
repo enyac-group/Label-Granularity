@@ -67,6 +67,7 @@ def confusion(net, loader, classes_f2c):
     conf_matrix_nrm = (conf_matrix_nrm + np.transpose(conf_matrix_nrm)) / 2.
     print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
     num_coarse_classes = max([c for f,c in enumerate(classes_f2c)]) + 1
+    print('class_f2c: {}'.format(class_f2c))
     print('num_coarse_classes: {}'.format(num_coarse_classes))
     group = [[f for f,c in enumerate(classes_f2c) if c == c_cls] for c_cls in range(num_coarse_classes)]
     print('group: {}'.format(group))
