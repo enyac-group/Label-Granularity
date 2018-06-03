@@ -38,6 +38,8 @@ def conf_matrix(net, loader, num_classes=10):
         outputs, _ = net(inputs)
         pred_cls = outputs.data.cpu().numpy().argmax(axis=1)
         assert len(pred_cls.shape) == 1
+        print('targ: {}'.format(targ_cls))
+        print('pred: {}'.format(pred_cls))
         for i in range(pred_cls.shape[0]):
             cls_as[targ_cls[i], pred_cls[i]] += 1
 
