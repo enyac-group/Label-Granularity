@@ -57,6 +57,12 @@ python main_f2c_imagenet.py --f2c 1 --categories fruit_vege --resume --resume_di
 # Train on CIFAR-100 subset:
 python main_f2c_cifar100.py --f2c 1 --categories animals --data_ratio 1.
 
+# Get ACR for CIFAR-10 with customized superclasses
+python main_f2c.py --f2c 0 --resume --resume_dir results/2018-05-31_07-16-10 --test_confmat 1 --superclass 01289
+
+# Get ACR for CIFAR-10 with random subclass
+python main_f2c.py --f2c 0 --resume --resume_dir results/2018-05-31_07-16-10 --test_confmat 1 --randomness 0.001
+
 
 
 

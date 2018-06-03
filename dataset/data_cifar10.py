@@ -129,6 +129,20 @@ class CIFAR10(data.Dataset):
             fo.close()
             self.test_data = self.test_data.reshape((10000, 3, 32, 32))
             self.test_data = self.test_data.transpose((0, 2, 3, 1))  # convert to HWC
+            # !!!!! randomly swap labels within super class !!!!!
+            if randomness > 0.:
+                num_c_classes = max([classes_f2c[f] for f in classes_f2c])+1
+                idx_dict = {i:[j for j in range(len(self.test_labels)) 
+                        if classes_f2c[self.test_labels[j]] == i] for i in range(num_c_classes)}
+                random.seed(1234)
+                cnt = 0
+                for i in range(len(self.test_labels)):
+                    if random.random() < randomness:
+                        cnt += 1
+                        pool = idx_dict[classes_f2c[self.test_labels[i]]]
+                        swap = random.randint(0,len(pool)-1)
+                        self.test_labels[i], self.test_labels[swap] = self.test_labels[swap], self.test_labels[i]
+                print('swapped {} testing data labels'.format(cnt))
 
     def __getitem__(self, index):
         """
