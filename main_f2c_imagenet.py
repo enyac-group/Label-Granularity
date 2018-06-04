@@ -33,7 +33,7 @@ parser.add_argument('--results_dir', metavar='RESULTS_DIR', default='./results',
                     help='results dir')
 parser.add_argument('--resume_dir', default=None, help='resume dir')
 parser.add_argument('--superclass', default=None, help='one of the super class')
-parser.add_argument('--gpus', default='0', help='gpus used')
+parser.add_argument('--gpus', default='0,1', help='gpus used')
 parser.add_argument('--f2c', type=int, default=None, help='whether use coarse label')
 parser.add_argument('--categories', default=None, help='which classes to use')
 parser.add_argument('--data_ratio', type=float, default=1., help='ratio of training data to use')
