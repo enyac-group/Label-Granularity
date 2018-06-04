@@ -99,7 +99,7 @@ def confusion(net, loader, classes_f2c):
     matrix = conf_matrix(net, loader, num_classes=len(classes_f2c))
     conf_matrix_nrm = matrix / matrix.sum(axis=0)
     conf_matrix_nrm = (conf_matrix_nrm + np.transpose(conf_matrix_nrm)) / 2.
-    print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
+    #print('normalized confusion matrix: \n{}'.format(conf_matrix_nrm))
     inter_confusion = inter_conf(conf_matrix_nrm, group=classes_f2c)
     intra_confusion = intra_conf(conf_matrix_nrm, group=classes_f2c)
     return inter_confusion, intra_confusion

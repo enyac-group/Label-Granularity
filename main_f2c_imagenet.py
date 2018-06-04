@@ -38,6 +38,7 @@ parser.add_argument('--f2c', type=int, default=None, help='whether use coarse la
 parser.add_argument('--categories', default=None, help='which classes to use')
 parser.add_argument('--data_ratio', type=float, default=1., help='ratio of training data to use')
 parser.add_argument('--add_layer', type=int, default=0, help='whether to add additional layer')
+parser.add_argument('--dropout', type=float, default=0., help='dropout rates, default 0.3')
 parser.add_argument('--test_confmat', type=int, default=0, help='whether to test confmat')
 args = parser.parse_args()
 
@@ -133,7 +134,7 @@ else:
     print('==> Building model..')
     # net = VGG('VGG8')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=NUM_CLASS, thickness=16, blocks=[2,2,2,2], dropout=0., fine_cls=fine_cls)
+    net = PreActResNet18(num_classes=NUM_CLASS, thickness=16, blocks=[2,2,2,2], dropout=args.dropout, fine_cls=fine_cls)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
