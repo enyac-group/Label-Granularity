@@ -22,7 +22,6 @@ from datetime import datetime
 import logging
 import pickle
 import pandas as pd
-import matplotlib.pyplot as plt
 import dataset
 
 def conf_matrix(net, loader, num_classes=10):
