@@ -21,7 +21,6 @@ from torch.autograd import Variable
 from datetime import datetime
 import logging
 import pickle
-import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 import dataset

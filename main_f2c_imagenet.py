@@ -318,23 +318,23 @@ elif args.f2c == 0:
         logging.info('\nEpoch: {}\tTestset mean ACR: {}'.format(epoch, sum(inter_confusion_list)/sum(intra_confusion_list)))
 
     
-# if args.f2c == 1:
-#     logging.info('Test trainset: ')
-#     trainset_test = dataset.data_imagenet.ImageFolder(root=None, train=True, class_list=classes, transform=transform_test, data_ratio=args.data_ratio)
-#     trainloader_test = torch.utils.data.DataLoader(trainset_test, batch_size=500, shuffle=False, num_workers=2)
-#     test(start_epoch, f2c=True, train_f=False, testloader=trainloader_test)
+if args.f2c == 1:
+    logging.info('Test trainset: ')
+    trainset_test = dataset.data_imagenet.ImageFolder(root=None, train=True, class_list=classes, transform=transform_test, data_ratio=args.data_ratio)
+    trainloader_test = torch.utils.data.DataLoader(trainset_test, batch_size=500, shuffle=False, num_workers=2)
+    test(start_epoch, f2c=True, train_f=False, testloader=trainloader_test)
 
-#     logging.info('Test testset: ')
-#     test(start_epoch, f2c=True, train_f=False, testloader=testloader)
+    logging.info('Test testset: ')
+    test(start_epoch, f2c=True, train_f=False, testloader=testloader)
 
-# elif args.f2c == 0:
-#     logging.info('Test trainset: ')
-#     trainset_test = dataset.data_imagenet.ImageFolder(root=None, train=True, class_list=classes, transform=transform_test, data_ratio=args.data_ratio)
-#     trainloader_test = torch.utils.data.DataLoader(trainset_test, batch_size=500, shuffle=False, num_workers=2)
-#     test(start_epoch, f2c=True, train_f=True, testloader=trainloader_test)
+elif args.f2c == 0:
+    logging.info('Test trainset: ')
+    trainset_test = dataset.data_imagenet.ImageFolder(root=None, train=True, class_list=classes, transform=transform_test, data_ratio=args.data_ratio)
+    trainloader_test = torch.utils.data.DataLoader(trainset_test, batch_size=500, shuffle=False, num_workers=2)
+    test(start_epoch, f2c=True, train_f=True, testloader=trainloader_test)
 
-#     logging.info('Test testset: ')
-#     test(start_epoch, f2c=True, train_f=True, testloader=testloader)
+    logging.info('Test testset: ')
+    test(start_epoch, f2c=True, train_f=True, testloader=testloader)
 
 
 
