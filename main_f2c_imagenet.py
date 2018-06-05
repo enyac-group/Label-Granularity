@@ -40,6 +40,7 @@ parser.add_argument('--data_ratio', type=float, default=1., help='ratio of train
 parser.add_argument('--add_layer', type=int, default=0, help='whether to add additional layer')
 parser.add_argument('--dropout', type=float, default=0., help='dropout rates, default 0.3')
 parser.add_argument('--test_confmat', type=int, default=0, help='whether to test confmat')
+parser.add_argument('--thickness', type=int, default=16, help='thickness of network')
 args = parser.parse_args()
 
 args.save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -134,7 +135,7 @@ else:
     print('==> Building model..')
     # net = VGG('VGG8')
     # net = ResNet18()
-    net = PreActResNet18(num_classes=NUM_CLASS, thickness=16, blocks=[2,2,2,2], dropout=args.dropout, fine_cls=fine_cls)
+    net = PreActResNet18(num_classes=NUM_CLASS, thickness=args.thickness, blocks=[2,2,2,2], dropout=args.dropout, fine_cls=fine_cls)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
