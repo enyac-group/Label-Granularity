@@ -40,6 +40,7 @@ parser.add_argument('--data_ratio', type=float, default=1., help='ratio of train
 parser.add_argument('--add_layer', type=int, default=0, help='whether to add additional layer')
 parser.add_argument('--dropout', type=float, default=.3, help='dropout rates, default 0.3')
 parser.add_argument('--test_confmat', type=int, default=0, help='whether to test confmat')
+parser.add_argument('--widen_factor', type=int, default=10, help='widen factor for net')
 args = parser.parse_args()
 
 if args.test_confmat == 1:
@@ -266,7 +267,7 @@ else:
     # net = VGG('VGG19')
     # net = ResNet18()
     #net = PreActResNet18(num_classes=100)
-    net = wide_resnet(num_classes=NUM_CLASSES, fine_cls=fine_cls, dropout_rate=args.dropout)
+    net = wide_resnet(num_classes=NUM_CLASSES, fine_cls=fine_cls, dropout_rate=args.dropout, widen_factor=args.widen_factor)
     # net = GoogLeNet()
     # net = DenseNet121()
     # net = ResNeXt29_2x64d()
