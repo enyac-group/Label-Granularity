@@ -4,10 +4,11 @@ import numpy as np
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
+print 'good'
 
 results_dir = '/home/rzding/pytorch-cifar/results'
-SPLIT = 'test'
-DATASET_NAME = 'CIFAR100'
+SPLIT = 'train'
+DATASET_NAME = 'CIFAR10'
 if DATASET_NAME == 'CIFAR10':
 	if SPLIT == 'test':
 		dataset = 'CIFAR10_TEST'
