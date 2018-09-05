@@ -1,3 +1,9 @@
+# Label-Granularity
+
+Understanding the Impact of Label Granularity on CNN-based Image Classification
+
+Usage:
+
 python main_f2c.py --resume --resume_dir results/2018-04-23_03-38-31 
 
 CUDA_VISIBLE_DEVICES=1 python main_f2c.py
