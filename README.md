@@ -1,6 +1,4 @@
-# Label-Granularity
-
-Understanding the Impact of Label Granularity on CNN-based Image Classification
+# Understanding the Impact of Label Granularity on CNN-based Image Classification
 
 Usage:
 
